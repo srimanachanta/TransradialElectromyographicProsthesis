@@ -57,22 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ADC1_CS_Pin GPIO_PIN_0
-#define ADC1_CS_GPIO_Port GPIOB
-#define ADC2_CS_Pin GPIO_PIN_1
-#define ADC2_CS_GPIO_Port GPIOB
-#define ADC3_CS_Pin GPIO_PIN_2
-#define ADC3_CS_GPIO_Port GPIOB
-#define ADC4_CS_Pin GPIO_PIN_3
-#define ADC4_CS_GPIO_Port GPIOB
-#define ADC5_CS_Pin GPIO_PIN_4
-#define ADC5_CS_GPIO_Port GPIOB
-#define ADC6_CS_Pin GPIO_PIN_5
-#define ADC6_CS_GPIO_Port GPIOB
-#define ADC7_CS_Pin GPIO_PIN_6
-#define ADC7_CS_GPIO_Port GPIOB
-#define ADC8_CS_Pin GPIO_PIN_7
-#define ADC8_CS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

@@ -9,7 +9,7 @@ SENSOR_A_ADDRESS = "/dev/cu.usbmodem1101"
 SENSOR_B_ADDRESS = "/dev/cu.usbmodem1201"
 
 SAMPLING_RATE_SPS = 1000
-DATA_FILE = "data.hdf5"
+DATA_FILE = "data/data.hdf5"
 DATASET_NAME = "test"
 
 

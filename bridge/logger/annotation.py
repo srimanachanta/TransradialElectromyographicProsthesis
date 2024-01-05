@@ -11,6 +11,7 @@ def generate_and_save_y_data(data_dir: str, y_file_name: str, sample_count: int,
             data[i, frame_idx:] = action_class
 
     out_path = os.path.join(data_dir, y_file_name)
+    print(f"Saving y-data for {out_path} @ {sampling_rate_sps}sps")
     np.save(out_path, data)
 
 

@@ -86,7 +86,7 @@ if __name__ == "__main__":
         [(0.167, 1), (0.367, 0), (0.933, 2), (1.033, 0), (1.767, 1), (2.000, 0), (3.133, 2), (3.267, 0)],
         [(0.100, 1), (0.433, 0), (0.700, 2), (1.100, 0), (1.600, 1), (2.367, 0), (3.000, 2), (3.330, 0)],
         []])
-    generate_and_save_y_data("data/solo_press", y_name, **get_dataset_meta("data/solo_press", "muscle_data.npy", video_len_seconds=7.268), joint_actions=[
+    generate_and_save_y_data("data/solo_finger_press", y_name, **get_dataset_meta("data/solo_finger_press", "muscle_data.npy", video_len_seconds=7.268), joint_actions=[
         [(0.300, 1), (0.400, 0)],
         [(0.367, 1), (0.600, 0), (0.660, 2), (0.800, 0)],
         [(1.600, 1), (1.700, 0)],

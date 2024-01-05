@@ -1,6 +1,31 @@
 import os.path
 import numpy as np
 
+# Procedures
+# DATASET_NAME = "pickup_ball"
+# DATASET_NAME = "pickup_ball_palm"
+# DATASET_NAME = "throw_ball"
+# DATASET_NAME = "throw_ball_palm"
+# DATASET_NAME = "thumbs_up"
+# DATASET_NAME = "piano"
+
+# Finger datasets
+# DATASET_NAME = "solo_finger"
+# DATASET_NAME = "thumb_duo"
+# DATASET_NAME = "index_duo"
+# DATASET_NAME = "middle_duo"
+# DATASET_NAME = "pinkie_duo"
+
+# DATASET_NAME = "solo_finger_press"
+# DATASET_NAME = "thumb_duo_press"
+# DATASET_NAME = "index_duo_press"
+# DATASET_NAME = "middle_duo_press"
+# DATASET_NAME = "ring_duo_press"
+# DATASET_NAME = "pinkie_duo_press"
+
+# DATASET_NAME = "wrist"
+# DATASET_NAME = "fist"
+
 
 def generate_and_save_y_data(data_dir: str, y_file_name: str, sample_count: int, sampling_rate_sps: int, joint_actions: list[list[tuple[float, int]]]):
     data = np.zeros((11, sample_count))

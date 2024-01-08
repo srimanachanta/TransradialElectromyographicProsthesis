@@ -23,9 +23,8 @@ from torch.utils.data import Dataset
 
 # 64, 128, 256, 512
 
-
 def create_y_matrix(y_vec: np.ndarray, num_classes: int) -> np.ndarray:
-    return np.take(np.eye(num_classes), y_vec, axis=0)
+    return np.take(np.eye(num_classes), y_vec.astype(np.int32), axis=0)
 
 
 class SamplesDataset(Dataset):

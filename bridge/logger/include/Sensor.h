@@ -1,20 +1,32 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <iostream>
 
 class Sensor {
 public:
     explicit Sensor(const std::string &port)
-            : io(), serial(io, port) {
+            : io(), serial(io, port), enabled(false) {
         serial.set_option(boost::asio::serial_port_base::baud_rate(115200));
     }
 
+    ~Sensor() {
+        Disable();
+        serial.close();
+    }
+
     void Enable() {
-        boost::asio::write(serial, boost::asio::buffer(&START_MESSAGE, 1));
+        if(!enabled) {
+            boost::asio::write(serial, boost::asio::buffer(&START_MESSAGE, 1));
+            enabled = true;
+        }
     }
 
     void Disable() {
-        boost::asio::write(serial, boost::asio::buffer(&STOP_MESSAGE, 1));
+        if(enabled) {
+            boost::asio::write(serial, boost::asio::buffer(&STOP_MESSAGE, 1));
+            enabled = false;
+        }
     }
 
     void SyncClock() {
@@ -44,7 +56,6 @@ public:
         return std::make_pair(timestamp, adc_data);
     }
 
-
 private:
     static constexpr int START_MESSAGE = 0x1;
     static constexpr int STOP_MESSAGE = 0x2;
@@ -52,6 +63,7 @@ private:
 
     boost::asio::io_service io;
     boost::asio::serial_port serial;
+    bool enabled;
 
     std::string ReadLine() {
         std::string result;

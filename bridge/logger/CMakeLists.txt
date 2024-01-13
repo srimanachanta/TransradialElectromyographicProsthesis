@@ -6,9 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Boost REQUIRED COMPONENTS system regex)
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(HDF5)
-include_directories(${HDF5_INCLUDE_DIR})
-
 include_directories("include")
 file(GLOB SOURCES "src/*.cpp")
 add_executable(logger ${SOURCES})

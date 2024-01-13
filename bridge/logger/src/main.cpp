@@ -27,7 +27,12 @@
 int main() {
     using namespace std::chrono_literals;
 
-    auto SAMPLING_RATE_SPS = 500.0;
+    auto SAMPLING_RATE_SPS = 1000.0;
+    auto WINDOW_SIZE_MICROS = (long) ((1.0/SAMPLING_RATE_SPS) * 1000000) - 100;
+
+    auto MEASURE_TIME_SEC = 6.0;
+    auto MEASURE_TIME_MICROS = (long) MEASURE_TIME_SEC * 1000000;
+
     auto SAMPLING_PERIOD_DURATION = std::chrono::duration_cast<std::chrono::microseconds>(1.0s / SAMPLING_RATE_SPS);
     std::string DATA_DIR_PATH = "/Users/srimanachanta/dev/Research/TransradialElectromyographicProsthesis/bridge/logger/data";
     std::string OUTFILE_PATH = DATA_DIR_PATH + "/pickup_ball/x.txt";
@@ -41,66 +46,47 @@ int main() {
         Sensor first_sensor(SENSOR_A_ADDRESS);
         Sensor second_sensor(SENSOR_B_ADDRESS);
 
+        std::ofstream outfile;
+        outfile.clear();
+        outfile.open(OUTFILE_PATH);
+
         first_sensor.Enable();
         second_sensor.Enable();
 
-//        std::ofstream outfile;
-//        outfile.clear();
-//        outfile.open(OUTFILE_PATH);
-
-        std::vector<std::vector<double>> data;
-
+        int count = 0;
+        long last_time = 0;
         while(v.load()) {
-            auto start_time = std::chrono::steady_clock::now();
-
             auto f1 = first_sensor.GetDataFrame();
             auto f2 = second_sensor.GetDataFrame();
 
-//            for(int i = 0; i < 12; i ++) {
-//                if(i < 6) {
-//                    outfile << f1.second[i];
-//                } else {
-//                    outfile << f2.second[i - 6];
-//                }
-//                outfile << ",";
-//            }
-//            outfile << std::endl;
+            if(f1.first > MEASURE_TIME_MICROS) {
+                break;
+            } else if(last_time == 0 || f1.first - last_time >= WINDOW_SIZE_MICROS) {
+                count++;
+                last_time = f1.first;
 
-//            auto out = std::vector<double>();
-//            for(int i = 0; i < 12; i ++) {
-//               if(i < 6) {
-//                    out[i] = f1.second[i];
-//                } else {
-//                   out[i] = f2.second[i - 6];
-//                }
-//            }
-//
-            data.push_back({0.0, 0.0});
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed = end_time-start_time;
-            auto remaining = std::chrono::duration_cast<std::chrono::microseconds>( SAMPLING_PERIOD_DURATION - elapsed);
-
-            if(remaining.count() > 0) {
-                std::this_thread::sleep_for(remaining);
-            } else {
-                std::cout << "Loop Overrun" << std::endl;
+                for(int i = 0; i < 12; i++) {
+                    if(i < 6) {
+                        outfile << f1.second[i];
+                    } else {
+                        outfile << f2.second[i - 6];
+                    }
+                }
+                outfile << std::endl;
             }
         }
-
-        std::cout << data.size() << std::endl;
 
         first_sensor.Disable();
         second_sensor.Disable();
 
-//        outfile.close();
+        outfile.close();
+
+        std::cout << "Saved the following # of samples: " << count << std::endl;
     });
 
-    std::this_thread::sleep_for(3s);
-
 //    std::cin.get();
-
-    v.store(false);
+//
+//    v.store(false);
 
     t1.join();
 }

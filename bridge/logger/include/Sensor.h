@@ -11,7 +11,6 @@ public:
     }
 
     ~Sensor() {
-        Disable();
         serial.close();
     }
 

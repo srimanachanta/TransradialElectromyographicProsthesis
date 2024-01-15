@@ -3,17 +3,12 @@
 #include <thread>
 #include <fstream>
 
-// "pickup_ball"
-// "pickup_ball_palm"
-// "throw_ball"
-// "throw_ball_palm"
-// "piano"
+// "solo_finger" (12.0 seconds)
+// "thumb_duo" (12.0 seconds)
+// "index_duo" (10.0 seconds)
+// "middle_duo" (10.0 seconds)
+// "pinkie_duo (10.0 seconds)
 
-// "solo_finger"
-// "thumb_duo"
-// "index_duo"
-// "middle_duo"
-// "pinkie_duo"
 // "solo_finger_press"
 // "thumb_duo_press"
 // "index_duo_press"
@@ -24,27 +19,41 @@
 // "wrist"
 // "fist"
 
+// "pickup_ball_palm"
+// "throw_ball_palm"
+// "piano_twinkle"
+
+
 int main() {
     using namespace std::chrono_literals;
 
-    auto SAMPLING_RATE_SPS = 1000.0;
-    auto WINDOW_SIZE_MICROS = (long) ((1.0/SAMPLING_RATE_SPS) * 1000000) - 100;
+    auto SAMPLING_RATE_SPS = 1024.0;
+    auto WINDOW_SIZE_MICROS = (long) ((1.0/SAMPLING_RATE_SPS) * 1000000) - 80;
 
-    auto MEASURE_TIME_SEC = 6.0;
+    auto MEASURE_TIME_SEC = 10.0;
     auto MEASURE_TIME_MICROS = (long) MEASURE_TIME_SEC * 1000000;
 
     auto SAMPLING_PERIOD_DURATION = std::chrono::duration_cast<std::chrono::microseconds>(1.0s / SAMPLING_RATE_SPS);
     std::string DATA_DIR_PATH = "/Users/srimanachanta/dev/Research/TransradialElectromyographicProsthesis/bridge/logger/data";
-    std::string OUTFILE_PATH = DATA_DIR_PATH + "/pickup_ball/x.txt";
+    std::string PROCEDURE_NAME = "throw_ball_palm";
+    std::string OUTFILE_PATH = DATA_DIR_PATH + "/" + PROCEDURE_NAME + "/x.txt";
+
+    auto SENSOR_A_ADDRESS = "/dev/cu.usbmodem11101";
+    auto SENSOR_B_ADDRESS = "/dev/cu.usbmodem11201";
+
+    Sensor first_sensor(SENSOR_A_ADDRESS);
+    Sensor second_sensor(SENSOR_B_ADDRESS);
+
+//    first_sensor.Enable();
+//    second_sensor.Enable();
+//    return 0;
 
     std::atomic_bool v = true;
 
-    std::thread t1([&] {
-        auto SENSOR_A_ADDRESS = "/dev/cu.usbmodem1101";
-        auto SENSOR_B_ADDRESS = "/dev/cu.usbmodem1201";
+    std::this_thread::sleep_for(1s);
 
-        Sensor first_sensor(SENSOR_A_ADDRESS);
-        Sensor second_sensor(SENSOR_B_ADDRESS);
+    std::thread t1([&] {
+        std::cout << "Starting" << std::endl;
 
         std::ofstream outfile;
         outfile.clear();
@@ -71,6 +80,7 @@ int main() {
                     } else {
                         outfile << f2.second[i - 6];
                     }
+                    outfile << ",";
                 }
                 outfile << std::endl;
             }
@@ -83,10 +93,6 @@ int main() {
 
         std::cout << "Saved the following # of samples: " << count << std::endl;
     });
-
-//    std::cin.get();
-//
-//    v.store(false);
 
     t1.join();
 }

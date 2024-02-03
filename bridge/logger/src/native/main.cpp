@@ -8,17 +8,17 @@
 // "index_duo" (10.0 seconds)
 // "middle_duo" (10.0 seconds)
 // "pinkie_duo (10.0 seconds)
-
+//
 // "solo_finger_press"
 // "thumb_duo_press"
 // "index_duo_press"
 // "middle_duo_press"
 // "ring_duo_press"
 // "pinkie_duo_press"
-
+//
 // "wrist"
 // "fist"
-
+//
 // "pickup_ball_palm"
 // "throw_ball_palm"
 // "piano_twinkle"

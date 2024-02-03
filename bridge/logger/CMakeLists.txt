@@ -7,5 +7,5 @@ find_package(Boost REQUIRED COMPONENTS system regex)
 include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories("include")
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/native/*.cpp")
 add_executable(logger ${SOURCES})

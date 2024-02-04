@@ -1,92 +1,76 @@
 import torch
 from tqdm import tqdm
-from torchmetrics.classification import BinaryAccuracy
+from torchmetrics.classification import MulticlassAccuracy
+
 
 
 class Trainer:
-    def __init__(self, optimizer_contrastive, loss_contrastive, optimizer_classifier, loss_classifier, device, encoder, classifier, epochs):
+    def __init__(self, optimizer_classifier, loss_classifier, device, encoder, epochs):
         self.device = device
-        self.encoder = encoder.to(self.device)
-        self.classifier = classifier.to(self.device)
-        self.optimizer_contrastive = optimizer_contrastive
-        self.loss_contrastive = loss_contrastive
+        self.encoder = encoder.float().to(self.device)
         self.optimizer_classifier = optimizer_classifier
-        self.loss_classifier = loss_classifier
+        self.loss_classifier = [i.to(self.device) for i in loss_classifier]
         self.epochs = epochs
 
-    def train_encoder(self, train):
+    def train(self, train):
         running_loss = 0.0
         step = 0
-        self.encoder.train(mode=True)
+        ACC = MulticlassAccuracy(num_classes=3).to(self.device)
+        accurracy = 0.0
         for _, batch in enumerate(tqdm(train)):
             x = batch[0].to(self.device)
-            y = batch[0].to(self.device)
-            self.optimizer_contrastive.zero_grad()
-            pred = self.encoder(x)
-            loss = self.loss_contrastive(pred, y)
-
-            loss.backward()
-            self.optimizer_contrastive.step()
-            running_loss += loss.item()
-            step += 1
-        return running_loss/step
-
-    def train_classifier(self, train):
-        running_loss = 0.0
-        step = 0
-        self.encoder.train(mode=False)
-        self.classifier.train(mode=True)
-        acc = 0.0
-        for _, batch in enumerate(tqdm(train)):
-            x = batch[0].to(self.device)
-            y = batch[0].to(self.device)
+            y = batch[1].to(self.device)
             self.optimizer_classifier.zero_grad()
-            with torch.no_grad:
-                pred = self.encoder(x)
-            out = self.classifier(pred)
-            loss = self.loss_classifier(out, y)
+            pred = self.encoder(x)
+
+            loss = self.loss_classifier[0](pred[:, 0], y[:, 0])
+
+            for i in range(1, len(self.loss_classifier)):
+                loss += self.loss_classifier[i](pred[:, i], y[:, i])
 
             loss.backward()
             self.optimizer_classifier.step()
             running_loss += loss.item()
             step += 1
-            ACC = BinaryAccuracy(multidim_average='samplewise')
-            acc += ACC(out, y)
-        return running_loss / step, acc / step
 
-    def test_classifier(self, test):
+            # print(pred[0], y[0])
+
+            accurracy += ACC(pred, y)
+
+        return running_loss / step, accurracy / step
+
+    def test(self, test):
         running_loss = 0.0
         step = 0
-        self.encoder.train(mode=False)
-        self.classifier.train(mode=False)
-        acc = 0.0
-        with torch.no_grad:
-            for _, batch in enumerate(tqdm(test)):
-                x = batch[0].to(self.device)
-                y = batch[0].to(self.device)
-
+        ACC = MulticlassAccuracy(num_classes=3).to(self.device)
+        accurracy = 0.0
+        for _, batch in enumerate(tqdm(test)):
+            x = batch[0].to(self.device)
+            y = batch[1].to(self.device)
+            with torch.no_grad():
                 pred = self.encoder(x)
-                out = self.classifier(pred)
 
-                loss = self.loss_classifier(out, y)
-                running_loss += loss.item()
-                step += 1
-                ACC = BinaryAccuracy(multidim_average='samplewise')
-                acc += ACC(out, y)
-        return running_loss / step, acc / step
+            loss = self.loss_classifier[0](pred[:, 0], y[:, 0])
+
+            for i in range(1, len(self.loss_classifier)):
+                loss += self.loss_classifier[i](pred[:, i], y[:, i])
+
+            running_loss += loss.item()
+            step += 1
+
+            accurracy += ACC(pred, y)
+
+        return running_loss / step, accurracy / step
 
     def Train_Test(self, train, test):
         print("Training Encoder")
         for i in range(self.epochs):
-            loss_train = self.train_encoder(train)
-            print(f"Epoch {i+1}: Encoder Loss: {str(loss_train)}")
-        torch.save(self.encoder.state_dict(), f"weights/encoder/epoch-{self.epochs}-classifier")
+            loss_train, acc = self.train(train)
+            print(f"Epoch {i+1}: Train Loss: {str(loss_train)}, Train Accuracy: {str(acc)}")
 
-        print("Training and Testing Classifier")
-        for i in range(25):
-            loss_train, auc_train = self.train_classifier(train)
-            loss_test, auc_test = self.test_classifier(test)
-            print(f"Epoch {i+1}: Training Classifier Loss: {str(loss_train)}, Train ACC: {str(auc_train)}")
-            print(f"Epoch {i + 1}: Testing Classifier Loss: {str(loss_test)}, Testing ACC: {str(auc_test)}")
-            torch.save(self.classifier.state_dict(), f"weights/classifier/epoch-{self.epochs}-classifier")
+            if i % 2 == 0:
+                loss_train, acc = self.test(test)
+                print(f"Epoch {i + 1}: Test Loss: {str(loss_train)}, Test Accuracy: {str(acc)}")
+
+        # torch.save(self.encoder.state_dict(), f"weights/encoder/epoch-{self.epochs}-classifier")
 

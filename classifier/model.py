@@ -22,59 +22,52 @@ class PositionalEncoding(nn.Module):
 
 
 class TransformerModel(nn.Module):
-    def __init__(self, input_dim=1, d_model=16, heads=4, activation="relu", dropout=0.2):
+    def __init__(self, input_dim=1, d_model=64, heads=1, activation="relu", dropout=0.2):
         super(TransformerModel, self).__init__()
 
         self.d_model = d_model
         self.heads = heads
+        self.signal_dim = 256
 
         self.encoder = nn.Linear(input_dim, d_model)
         self.pos_encoder = PositionalEncoding(d_model, dropout)
-        self.encoder_layer1 = nn.TransformerEncoderLayer(d_model, heads, activation=activation, dim_feedforward=128)
+        self.encoder_layer1 = nn.TransformerEncoderLayer(d_model, heads, activation=activation, dim_feedforward=256)
         self.head_transform = nn.Linear(d_model, int(d_model / heads))
 
         self.query = nn.Linear(12, 12)
         self.key = nn.Linear(12, 12)
         self.softmax = nn.Softmax(dim=2)
 
-        self.Linear1 = nn.Sequential(nn.Linear(int(512 * d_model / heads) * 3, 1024),
+        self.signal_linear = nn.Linear(512 * int(d_model/heads), self.signal_dim)
+
+        self.Linear1 = nn.Sequential(nn.Linear(self.signal_dim * 3, 256),
+                                     nn.ELU(),
+                                    # nn.Linear(512, 256),
+                                    # nn.ELU(),
+                                    nn.Linear(256, 3))
+
+        self.Linear2 = nn.Sequential(nn.Linear(self.signal_dim * 4, 256),
+                                     nn.ELU(),
+                                    # nn.Linear(512, 256),
+                                    # nn.ELU(),
+                                    nn.Linear(256, 3))
+
+        self.Linear3 = nn.Sequential(nn.Linear(self.signal_dim * 3, 256),
                                     nn.ELU(),
-                                    nn.Linear(1024, 512),
-                                    nn.ELU(),
-                                    nn.Linear(512, 256),
-                                    nn.ELU(),
+                                    # nn.Linear(512, 256),
+                                    # nn.ELU(),
                                     nn.Linear(256, 6))
 
-        self.Linear2 = nn.Sequential(nn.Linear(int(512 * d_model / heads) * 4, 1024),
+        self.Linear4 = nn.Sequential(nn.Linear(self.signal_dim * 4, 256),
                                     nn.ELU(),
-                                    nn.Linear(1024, 512),
-                                    nn.ELU(),
-                                    nn.Linear(512, 256),
-                                    nn.ELU(),
-                                    nn.Linear(256, 6))
+                                    # nn.Linear(512, 256),
+                                    # nn.ELU(),
+                                    nn.Linear(256, 3))
 
-        self.Linear3 = nn.Sequential(nn.Linear(int(512 * d_model / heads) * 3, 1024),
+        self.Linear5 = nn.Sequential(nn.Linear(self.signal_dim * 4, 256),
                                     nn.ELU(),
-                                    nn.Linear(1024, 512),
-                                    nn.ELU(),
-                                    nn.Linear(512, 256),
-                                    nn.ELU(),
-                                    nn.Linear(256, 12))
-
-        self.Linear4 = nn.Sequential(nn.Linear(int(512 * d_model / heads) * 4, 1024),
-                                    nn.ELU(),
-                                    nn.Linear(1024, 512),
-                                    nn.ELU(),
-                                    nn.Linear(512, 256),
-                                    nn.ELU(),
-                                    nn.Linear(256, 6))
-
-        self.Linear5 = nn.Sequential(nn.Linear(int(512 * d_model / heads) * 4, 1024),
-                                    nn.ELU(),
-                                    nn.Linear(1024, 512),
-                                    nn.ELU(),
-                                    nn.Linear(512, 256),
-                                    nn.ELU(),
+                                    # nn.Linear(512, 256),
+                                    # nn.ELU(),
                                     nn.Linear(256, 3))
 
     def forward(self, x):
@@ -88,16 +81,19 @@ class TransformerModel(nn.Module):
 
         x = torch.stack(x_list, dim=-1)
 
-        query = self.query(x.view(x.shape[0], int(512 * self.d_model / self.heads), -1)).view(x.shape[0], 12, -1)
-        key = self.key(x.view(x.shape[0], int(512 * self.d_model / self.heads), -1)).view(x.shape[0], 12, -1)
+        query = self.query(x.view(x.shape[0], -1, 12)).view(x.shape[0], 12, -1)
+        key = self.key(x.view(x.shape[0], -1, 12)).view(x.shape[0], 12, -1)
 
         scores = torch.bmm(query, key.transpose(1, 2)) / (x.shape[-1] ** 0.5)
-        x = torch.bmm(self.softmax(scores), x.view(x.shape[0], int(512 * self.d_model / self.heads), -1).transpose(1, 2)).view(x.shape[0], int(512 * self.d_model / self.heads), -1)
 
-        out1 = F.softmax(self.Linear1(x[:, :, [1, 7, 8]].view(x.shape[0], int(512 * self.d_model / self.heads) * 3)).view(x.shape[0], -1, 3), dim=-1)
-        out2 = F.softmax(self.Linear2(x[:, :, [0, 3, 4, 6]].view(x.shape[0], int(512 * self.d_model / self.heads) * 4)).view(x.shape[0], -1, 3), dim=-1)
-        out3 = F.softmax(self.Linear3(x[:, :, [0, 3, 4]].view(x.shape[0], int(512 * self.d_model / self.heads) * 3)).view(x.shape[0], -1, 3), dim=-1)
-        out4 = F.softmax(self.Linear4(x[:, :, [0, 3, 4, 5]].view(x.shape[0], int(512 * self.d_model / self.heads) * 4)).view(x.shape[0], -1, 3), dim=-1)
-        out5 = F.softmax(self.Linear5(x[:, :, [2, 9, 10, 11]].view(x.shape[0], int(512 * self.d_model / self.heads) * 4)).view(x.shape[0], -1, 3), dim=-1)
+        x = torch.bmm(self.softmax(scores), x.view(x.shape[0], -1, 12).transpose(1, 2)).view(x.shape[0], -1, 12)
+
+        x = self.signal_linear(x.view(x.shape[0], 12, -1)).view(x.shape[0], -1, 12)
+
+        out1 = F.softmax(self.Linear1(x[:, :, [1, 7, 8]].view(x.shape[0], -1)).view(x.shape[0], -1, 3), dim=-1)
+        out2 = F.softmax(self.Linear2(x[:, :, [0, 3, 4, 6]].view(x.shape[0], -1)).view(x.shape[0], -1, 3), dim=-1)
+        out3 = F.softmax(self.Linear3(x[:, :, [0, 3, 4]].view(x.shape[0], -1)).view(x.shape[0], -1, 3), dim=-1)
+        out4 = F.softmax(self.Linear4(x[:, :, [0, 3, 4, 5]].view(x.shape[0], -1)).view(x.shape[0], -1, 3), dim=-1)
+        out5 = F.softmax(self.Linear5(x[:, :, [2, 9, 10, 11]].view(x.shape[0], -1)).view(x.shape[0], -1, 3), dim=-1)
 
         return torch.concat([out1, out2, out3, out4, out5], dim=1)

@@ -1,7 +1,7 @@
 import torch
 from tqdm import tqdm
 from torchmetrics.classification import MulticlassAccuracy
-
+import numpy as np
 
 
 class Trainer:
@@ -19,13 +19,16 @@ class Trainer:
         accurracy = 0.0
         for _, batch in enumerate(tqdm(train)):
             x = batch[0].to(self.device)
-            y = batch[1].to(self.device)
+            y = batch[1].to(self.device)[:, [1, 3, 5, 7, 9, 10]]
+
             self.optimizer_classifier.zero_grad()
             pred = self.encoder(x)
 
+            # print(pred[0], y[0])
+
             loss = self.loss_classifier[0](pred[:, 0], y[:, 0])
 
-            for i in range(1, len(self.loss_classifier)):
+            for i in range(1, y.shape[1]-1):
                 loss += self.loss_classifier[i](pred[:, i], y[:, i])
 
             loss.backward()
@@ -33,7 +36,7 @@ class Trainer:
             running_loss += loss.item()
             step += 1
 
-            # print(pred[0], y[0])
+            print(pred[0], y[0])
 
             accurracy += ACC(pred, y)
 
@@ -46,13 +49,13 @@ class Trainer:
         accurracy = 0.0
         for _, batch in enumerate(tqdm(test)):
             x = batch[0].to(self.device)
-            y = batch[1].to(self.device)
+            y = batch[1].to(self.device)[:, [1, 3, 5, 7, 9, 10]]
             with torch.no_grad():
                 pred = self.encoder(x)
 
             loss = self.loss_classifier[0](pred[:, 0], y[:, 0])
 
-            for i in range(1, len(self.loss_classifier)):
+            for i in range(1, y.shape[1]-1):
                 loss += self.loss_classifier[i](pred[:, i], y[:, i])
 
             running_loss += loss.item()
@@ -72,5 +75,5 @@ class Trainer:
                 loss_train, acc = self.test(test)
                 print(f"Epoch {i + 1}: Test Loss: {str(loss_train)}, Test Accuracy: {str(acc)}")
 
-        # torch.save(self.encoder.state_dict(), f"weights/encoder/epoch-{self.epochs}-classifier")
+            torch.save(self.encoder.state_dict(), r"C:\Users\kesch\Desktop\TransradialElectromyographicProsthesis-zsch\classifier\encoding_weights\weight.pt")
 

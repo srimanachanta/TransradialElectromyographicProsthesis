@@ -2,7 +2,6 @@ from Train import Trainer
 from dataUtils import get_dataloaders
 from model import TransformerModel
 import torch
-from pytorch_metric_learning.losses import NTXentLoss
 
 epochs = 250
 batch_size = 64
@@ -10,11 +9,13 @@ batch_size = 64
 loaders = get_dataloaders(batch_size)
 
 encoder = TransformerModel()
+encoder.load_state_dict(torch.load("encoding_weights/weight.pt"))
 
 weights = torch.zeros(3)
-weights[0] = 0.0002
-weights[1] = 0.4999
-weights[2] = 0.4999
+weights[0] = 0.2
+# weights[0] = 0.02
+weights[1] = 0.49
+weights[2] = 0.2
 
 optimizer_contrastive = torch.optim.Adam(encoder.parameters(), lr=0.0001)
 loss_classifier = [torch.nn.CrossEntropyLoss(weight=weights) for _ in range(11)]

@@ -2,6 +2,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import torch
 
+
 # classes = {
 #     "no_movement": 0,
 #     "extending": 1,
@@ -52,15 +53,19 @@ class SamplesDataset(Dataset):
         self.window_size_samples = window_size_samples
 
         if self.x_data.shape[0] != self.y_data.shape[0]:
-            raise ValueError(f"Lengths of samples in x: {self.x_data.shape[1]} and y: {self.y_data.shape[1]} data are not equal")
+            raise ValueError(
+                f"Lengths of samples in x: {self.x_data.shape[1]} and y: {self.y_data.shape[1]} data are not equal")
 
     def __len__(self) -> int:
         return self.x_data.shape[0] - self.window_size_samples + 1
 
     def __getitem__(self, idx) -> tuple[np.ndarray, np.ndarray]:
-        return self.x_data[idx:(self.window_size_samples + idx)].astype(np.float32), create_y_matrix(self.y_data[self.window_size_samples + idx - 1], self.num_classes)
+        return self.x_data[idx:(self.window_size_samples + idx)].astype(np.float32), create_y_matrix(
+            self.y_data[self.window_size_samples + idx - 1], self.num_classes)
 
 
 class TimeWindowDataset(SamplesDataset):
-    def __init__(self, x_source_file_path: str, y_source_file_path: str, num_classes: int, window_size_ms: int, sampling_rate_sps: int):
-        super().__init__(x_source_file_path, y_source_file_path, num_classes, int(window_size_ms / 1000.0) * sampling_rate_sps)
+    def __init__(self, x_source_file_path: str, y_source_file_path: str, num_classes: int, window_size_ms: int,
+                 sampling_rate_sps: int):
+        super().__init__(x_source_file_path, y_source_file_path, num_classes,
+                         int(window_size_ms / 1000.0) * sampling_rate_sps)

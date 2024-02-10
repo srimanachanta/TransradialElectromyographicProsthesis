@@ -42,6 +42,8 @@ def get_dataloaders(batch_size):
                                    middle_duo_press, ring_duo_press, pinkie_duo, pinkie_duo_press,
                                    solo_finger, solo_finger_press, fist, wrist])
 
+    # Train_Dataset = ConcatDataset([solo_finger])
+
     Test_Total = ConcatDataset([pickup_ball_palm_Test, throw_ball_palm_Test, piano_Test])
 
     return {"Train": DataLoader(Train_Dataset, batch_size=batch_size, shuffle=True),

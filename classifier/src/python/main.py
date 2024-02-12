@@ -8,7 +8,7 @@ batch_size = 64
 
 loaders = get_dataloaders(batch_size)
 
-encoder = TransformerModel().to("cuda:0")
+encoder = TransformerModel().to("cuda" if torch.cuda.is_available() else "cpu")
 encoder.load_state_dict(torch.load("../../model_weights/weights.pt"))
 
 weights = torch.zeros(3)

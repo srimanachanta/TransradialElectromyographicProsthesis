@@ -12,7 +12,7 @@ int main() {
         auto start_time = std::chrono::steady_clock::now();
 
         auto x_data = torch::rand({1, 512, 12});
-        EMGSignalClassifier::classify(x_data.to(torch::kCPU));
+        auto pred = EMGSignalClassifier::classify(x_data.to(torch::kCPU));
 
         auto stop_time = std::chrono::steady_clock::now();
 

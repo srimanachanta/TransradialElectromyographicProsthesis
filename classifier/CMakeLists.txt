@@ -13,7 +13,12 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_library(classifier INTERFACE)
-target_include_directories(classifier INTERFACE src/native/include "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(
+        classifier
+        INTERFACE
+        src/native/include
+        ${CMAKE_CURRENT_BINARY_DIR}
+)
 target_link_libraries(classifier INTERFACE "${TORCH_LIBRARIES}")
 
 file(GLOB SOURCES "src/native/cpp/*.cpp")

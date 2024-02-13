@@ -1,6 +1,8 @@
 #pragma once
 
 #include <torch/script.h>
+#include <torch/mps.h>
+#include <torch/cuda.h>
 #include <utility>
 #include "ModelConfig.h"
 #include <iostream>
@@ -20,9 +22,37 @@ enum DoFForce {
  * method call (~1 ksps).
  */
 class EMGSignalClassifier {
-    inline static torch::jit::script::Module module = torch::jit::load(CLASSIFIER_TRACED_MODEL_PATH);
+    inline static torch::jit::script::Module module;
+
+    static torch::DeviceType get_device_type() {
+        if(torch::cuda::is_available()) {
+            return torch::kCUDA;
+        } else if(torch::mps::is_available()) {
+            return torch::kMPS;
+        } else {
+            return torch::kCPU;
+        }
+    }
 
 public:
+    /**
+     * Initialize the classifier's module
+     */
+    static void load_model() {
+        switch(get_device_type()) {
+            case torch::kCUDA:
+                // TODO
+                break;
+            case torch::kMPS:
+                module = torch::jit::load(CLASSIFIER_TRACED_MODEL_MPS_PATH);
+                break;
+            default:
+            case torch::kCPU:
+                module = torch::jit::load(CLASSIFIER_TRACED_MODEL_CPU_PATH);
+                break;
+        }
+    }
+
     /**
      * Determine the finger muscular force state of each DoF based on measured motor units collected over a
      * uniform time period (1 ksps). Calling this method with non-uniform time periods will significantly reduce
@@ -39,10 +69,7 @@ public:
      */
     static std::vector<DoFForce> classify(const torch::Tensor& data) {
         std::vector<torch::jit::IValue> inputs;
-        // MPS is disabled due to incomplete implementations of operations using the MPS.
-        // Partial usage with fallback can be implemented for performance improvements.
-        // TODO, handle running the classifier on CUDA enabled devices
-        inputs.emplace_back(data.to(torch::kCPU));
+        inputs.emplace_back(data.to(get_device_type()));
 
         auto pred = module.forward(inputs).toTensor();
 

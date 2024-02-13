@@ -1,7 +1,6 @@
 import torch
 from tqdm import tqdm
 from torchmetrics.classification import MulticlassAccuracy
-import numpy as np
 
 
 class Trainer:
@@ -24,8 +23,6 @@ class Trainer:
             self.optimizer_classifier.zero_grad()
 
             pred = self.encoder(x)
-
-            # print(pred[0], y[0])
 
             loss = self.loss_classifier[0](pred[:, 0], y[:, 0])
 
@@ -63,8 +60,6 @@ class Trainer:
             running_loss += loss.item()
             step += 1
 
-            # accurracy += ACC(pred, y)
-
             for i in range(6):
                 accurracy[i] += ACC(pred[:, i], y[:, i])
 
@@ -81,4 +76,3 @@ class Trainer:
                 print(f"Epoch {i + 1}: Test Loss: {str(loss_train)}, Test Accuracy: {str(acc)}")
 
             torch.save(self.encoder.state_dict(), r"C:\Users\kesch\Desktop\TransradialElectromyographicProsthesis\classifier\encoding_weights\weight.pt")
-

@@ -3,14 +3,14 @@
 #include <boost/asio.hpp>
 #include <iostream>
 
-class Sensor {
+class EMGSensorArray {
 public:
-    explicit Sensor(const std::string &port)
+    explicit EMGSensorArray(const std::string &port)
             : io(), serial(io, port), enabled(false) {
         serial.set_option(boost::asio::serial_port_base::baud_rate(115200));
     }
 
-    ~Sensor() {
+    ~EMGSensorArray() {
         serial.close();
     }
 

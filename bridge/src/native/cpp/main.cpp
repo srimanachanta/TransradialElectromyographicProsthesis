@@ -1,4 +1,4 @@
-#include "Sensor.h"
+#include "EMGSensorArray.h"
 #include <iostream>
 #include <thread>
 #include <fstream>
@@ -41,10 +41,10 @@ int main() {
     auto SENSOR_A_ADDRESS = "/dev/cu.usbmodem11101";
     auto SENSOR_B_ADDRESS = "/dev/cu.usbmodem11201";
 
-    Sensor first_sensor(SENSOR_A_ADDRESS);
-    Sensor second_sensor(SENSOR_B_ADDRESS);
+    EMGSensorArray first_sensor(SENSOR_A_ADDRESS);
+    EMGSensorArray second_sensor(SENSOR_B_ADDRESS);
 
-    // Used for Debugging Sensor Placement
+    // Used for Debugging EMGSensorArray Placement
     // first_sensor.Enable();
     // second_sensor.Enable();
     // return 0;

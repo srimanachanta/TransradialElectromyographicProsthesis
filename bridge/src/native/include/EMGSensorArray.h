@@ -3,6 +3,12 @@
 #include <boost/asio.hpp>
 #include <iostream>
 
+struct EMGSensorArrayMeasurement{
+    long deviceTimestampMicros;
+    std::vector<double> deviceMeasurement;
+};
+
+
 class EMGSensorArray {
 public:
     explicit EMGSensorArray(const std::string &port)
@@ -32,27 +38,26 @@ public:
         boost::asio::write(serial, boost::asio::buffer(&SYNC_ENABLE_TIME_MESSAGE, 1));
     }
 
-    std::pair<long, std::vector<double>> GetDataFrame() {
+    EMGSensorArrayMeasurement GetDataFrame() {
         auto data = ReadLine();
         std::stringstream data_stream(data);
 
-        long timestamp;
-        std::vector<double> adc_data;
+        auto out = EMGSensorArrayMeasurement{};
         for (int i = 0; i < 7; i++) {
             long v;
             data_stream >> v;
 
             if (i == 0) {
-                timestamp = v;
+                out.deviceTimestampMicros = v;
             } else {
-                adc_data.push_back((double) v * (5.0 / 4095.0));
+                out.deviceMeasurement.push_back((double) v * (5.0 / 4095.0));
             }
 
             if (data_stream.peek() == ',')
                 data_stream.ignore();
         }
 
-        return std::make_pair(timestamp, adc_data);
+        return out;
     }
 
 private:

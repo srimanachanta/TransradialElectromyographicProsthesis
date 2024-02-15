@@ -69,17 +69,17 @@ int main() {
             auto f1 = first_sensor.GetDataFrame();
             auto f2 = second_sensor.GetDataFrame();
 
-            if(f1.first > MEASURE_TIME_MICROS) {
+            if(f1.deviceTimestampMicros > MEASURE_TIME_MICROS) {
                 break;
-            } else if(last_time == 0 || f1.first - last_time >= WINDOW_SIZE_MICROS) {
+            } else if(last_time == 0 || f1.deviceTimestampMicros - last_time >= WINDOW_SIZE_MICROS) {
                 count++;
-                last_time = f1.first;
+                last_time = f1.deviceTimestampMicros;
 
                 for(int i = 0; i < 12; i++) {
                     if(i < 6) {
-                        outfile << f1.second[i];
+                        outfile << f1.deviceMeasurement[i];
                     } else {
-                        outfile << f2.second[i - 6];
+                        outfile << f2.deviceMeasurement[i - 6];
                     }
                     outfile << ",";
                 }

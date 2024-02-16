@@ -20,10 +20,9 @@
 class websocket_listener : public std::enable_shared_from_this<websocket_listener> {
     net::io_context& ioc_;
     tcp::acceptor acceptor_;
-    std::function<std::optional<beast::detail::ConstBufferSequence>()> supplier_;
 
 public:
-    websocket_listener(net::io_context& ioc, const tcp::endpoint& endpoint, std::function<std::optional<beast::detail::ConstBufferSequence>()> supplier) : ioc_(ioc), acceptor_(ioc), supplier_(std::move(supplier)) {
+    websocket_listener(net::io_context& ioc, const tcp::endpoint& endpoint) : ioc_(ioc), acceptor_(ioc) {
         beast::error_code ec;
 
         // Open the acceptor
@@ -70,7 +69,7 @@ private:
             fail(ec, "accept");
         } else {
             // Create the session and run it
-            std::make_shared<websocket_session>(std::move(socket), supplier_)->run();
+            std::make_shared<websocket_session>(std::move(socket))->run();
         }
 
         // Accept another connection

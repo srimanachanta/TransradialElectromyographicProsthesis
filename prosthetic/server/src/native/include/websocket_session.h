@@ -13,6 +13,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include "SystemDynamics.h"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -20,8 +21,8 @@ namespace websocket = beast::websocket;
 namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 
-void fail(beast::error_code ec, char const* what) {
-    if( ec == net::error::operation_aborted ||
+void fail(beast::error_code ec, char const *what) {
+    if (ec == net::error::operation_aborted ||
         ec == websocket::error::closed)
         return;
 
@@ -30,9 +31,9 @@ void fail(beast::error_code ec, char const* what) {
 
 // Echoes back all received WebSocket messages
 class websocket_session : public std::enable_shared_from_this<websocket_session> {
+private:
     websocket::stream<beast::tcp_stream> ws_;
     beast::flat_buffer buffer_;
-    std::function<std::optional<beast::detail::ConstBufferSequence>()> data_supplier;
 
     void on_run() {
         // Set suggested timeout settings for the websocket
@@ -42,13 +43,11 @@ class websocket_session : public std::enable_shared_from_this<websocket_session>
 
         // Set a decorator to change the Server of the handshake
         ws_.set_option(websocket::stream_base::decorator(
-                [](websocket::response_type& res)
-                {
+                [](websocket::response_type &res) {
                     res.set(http::field::server,
                             std::string(BOOST_BEAST_VERSION_STRING) +
                             " websocket-server-async");
                 }));
-
         // Accept the websocket handshake
         ws_.async_accept(
                 beast::bind_front_handler(
@@ -57,47 +56,76 @@ class websocket_session : public std::enable_shared_from_this<websocket_session>
     }
 
     void on_accept(beast::error_code ec) {
-        if(ec)
+        if (ec)
             return fail(ec, "accept");
 
-        ws_.async_write(
-                buffer_.data(),
+        std::cout << "Websocket Connection Opened" << std::endl;
+
+        do_read();
+    }
+
+    void do_read() {
+        ws_.async_read(
+                buffer_,
                 beast::bind_front_handler(
-                        &websocket_session::on_write,
+                        &websocket_session::on_read,
                         shared_from_this()));
     }
 
-    void on_write(beast::error_code ec, std::size_t) {
-        if(ec)
-            return fail(ec, "write");
+    void on_read(beast::error_code ec, std::size_t bytes_transferred) {
+        boost::ignore_unused(bytes_transferred);
 
-        auto data = data_supplier();
-        if(data == std::nullopt) {
-            on_write(ec, 0);
-        } else {
+        // This indicates that the session was closed
+        if (ec == websocket::error::closed)
+            return;
+
+        if (ec)
+            return fail(ec, "read");
+
+        auto currentServoPositions = net::buffer_cast<ProstheticServoPositions *>(buffer_.data());
+
+        auto newPositions = ProstheticSystemDynamics::calculateServoPositions(*currentServoPositions);
+
+        ws_.text(false);
+        if(newPositions.has_value()) {
             ws_.async_write(
-                    data.value(),
+                    net::buffer(&newPositions.value(), sizeof(ProstheticServoPositions)),
+                    beast::bind_front_handler(
+                            &websocket_session::on_write,
+                            shared_from_this()));
+        } else {
+            // There isn't a valid result, just stay as is until there is one
+            ws_.async_write(
+                    buffer_.data(),
                     beast::bind_front_handler(
                             &websocket_session::on_write,
                             shared_from_this()));
         }
     }
 
-public:
-    // Take ownership of the socket
-    explicit websocket_session(tcp::socket&& socket, std::function<std::optional<beast::detail::ConstBufferSequence>()> supplier) : ws_(std::move(socket)), data_supplier(std::move(supplier)) {
-        std::cout << "Websocket Connection Opened" << std::endl;
+    void on_write(beast::error_code ec,
+                  std::size_t bytes_transferred) {
+        boost::ignore_unused(bytes_transferred);
+
+        if (ec)
+            return fail(ec, "write");
+
+        // Clear the buffer
+        buffer_.consume(buffer_.size());
+
+        // Do another read
+        do_read();
     }
+
+
+public:
+    explicit websocket_session(tcp::socket &&socket) : ws_(std::move(socket)) {}
 
     ~websocket_session() {
         std::cout << "Websocket Connection Closed" << std::endl;
     }
 
     void run() {
-        // We need to be executing within a strand to perform async operations
-        // on the I/O objects in this session. Although not strictly necessary
-        // for single-threaded contexts, this example code is written to be
-        // thread-safe by default.
         net::dispatch(ws_.get_executor(),
                       beast::bind_front_handler(
                               &websocket_session::on_run,

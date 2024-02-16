@@ -1,3 +1,4 @@
+import struct
 from adafruit_servokit import ServoKit
 import asyncio
 import websockets
@@ -11,10 +12,19 @@ async def main():
     async for websocket in websockets.connect(uri):
         try:
             print("Websocket Connection Opened")
-            async for requested_position_byte_array in websocket:
-                requested_positions = [int(byte) for byte in requested_position_byte_array]
-                for i in range(16):
-                    servo_controller.servo[i].angle = requested_positions[i]
+            while True:
+                current_servo_positions = [min(max(round(servo_controller.servo[k].angle), 0), 180) for k in range(16)]
+
+                data = bytearray()
+                for n in current_servo_positions:
+                    data.extend(struct.pack('<H', n))
+                await websocket.send(data)
+
+                resp_positions_ba = await websocket.recv()
+                requested_positions = [struct.unpack('<H', resp_positions_ba[i:i+2])[0] for i in range(0, len(resp_positions_ba), 2)]
+
+                for i, v in enumerate(requested_positions):
+                    servo_controller.servo[i].angle = v
 
         except websockets.ConnectionClosed:
             print("Websocket Connection Closed")

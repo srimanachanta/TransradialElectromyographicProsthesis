@@ -10,34 +10,23 @@ template <typename T> class ThreadSafeCircularBuffer {
 public:
     explicit ThreadSafeCircularBuffer(size_t size) : buf(size) {}
 
-    void push_back(T item) {
+    void push_back(T& item) {
         lock.lock();
         buf.push_back(item);
         lock.unlock();
-    }
-
-    size_t get_size() {
-        lock.lock();
-        auto size =  buf.size();
-        lock.unlock();
-
-        return size;
     }
 
     bool is_full() {
         lock.lock();
         auto f = buf.size() == buf.capacity();
         lock.unlock();
+
         return f;
     }
 
-    std::vector<T> get_buffer() {
+    boost::circular_buffer<T> get_buffer() {
         lock.lock();
-        std::vector<T> container;
-        container.reserve(buf.size());
-        for(const auto& item : buf) {
-            container.emplace_back(item);
-        }
+        auto container = buf;
         lock.unlock();
 
         return container;

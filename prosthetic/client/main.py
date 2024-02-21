@@ -7,6 +7,12 @@ import websockets
 async def main():
     uri = "ws://192.168.1.155:8080"
     servo_controller = ServoKit(channels=16)
+    
+    # TODO Configure the initial positions of the servos
+    starting_positions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for i, v in enumerate(starting_positions):
+        servo_controller.servo[i].set_pulse_width_range(550, 2550)
+        servo_controller.servo[i].angle = v
 
     print(f"Looking for Prosthetic Server Connection at {uri}")
     async for websocket in websockets.connect(uri):

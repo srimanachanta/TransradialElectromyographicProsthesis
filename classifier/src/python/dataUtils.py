@@ -77,3 +77,22 @@ def normalize_x_data():
 
             np.save(os.path.join(dataset_path, "muscle_data_normalized.npy"), dataset_x_data)
             np.save(os.path.join(dataset_path, "muscle_data_cropped_normalized.npy"), dataset_x_data_cropped)
+
+
+def get_normalization_constants():
+    data = np.zeros((1, 12))
+
+    for dataset_name in os.listdir("dataset"):
+        dataset_path = os.path.join(os.path.join("dataset", dataset_name))
+        dataset_x_data = np.load(os.path.join(dataset_path, "muscle_data.npy"))
+
+        data = np.concatenate([data, dataset_x_data], axis=0)
+
+    data = data[1:]
+    mean = [np.average(data[:, idx]) for idx in range(12)]
+    stdevs = [np.std(data[:, idx]) for idx in range(12)]
+
+    return mean, stdevs
+
+
+print(get_normalization_constants())

@@ -49,34 +49,34 @@ def get_dataloaders(batch_size: int):
 
 def normalize_x_data():
     data = np.zeros((1, 12))
-    data_cropped = np.zeros((1, 12))
+    # data_cropped = np.zeros((1, 12))
 
-    for dataset_name in os.listdir("../bridge/logger/data"):
-        dataset_path = os.path.join(os.path.join("../bridge/logger/data", dataset_name))
+    for dataset_name in os.listdir("dataset"):
+        dataset_path = os.path.join(os.path.join("dataset", dataset_name))
         dataset_x_data = np.load(os.path.join(dataset_path, "muscle_data.npy"))
-        dataset_x_data_cropped = np.load(os.path.join(dataset_path, "muscle_data_cropped.npy"))
+        # dataset_x_data_cropped = np.load(os.path.join(dataset_path, "muscle_data_cropped.npy"))
 
         data = np.concatenate([data, dataset_x_data], axis=0)
-        data_cropped = np.concatenate([data_cropped, dataset_x_data_cropped], axis=0)
+        # data_cropped = np.concatenate([data_cropped, dataset_x_data_cropped], axis=0)
 
     data = data[1:]
-    data_cropped = data_cropped[1:]
+    # data_cropped = data_cropped[1:]
 
     stuff = [(np.average(data[:, idx]), np.std(data[:, idx])) for idx in range(12)]
-    stuff_cropped = [(np.average(data_cropped[:, idx]), np.std(data_cropped[:, idx])) for idx in range(12)]
+    # stuff_cropped = [(np.average(data_cropped[:, idx]), np.std(data_cropped[:, idx])) for idx in range(12)]
 
-    for dataset_name in os.listdir("../bridge/logger/data"):
-        dataset_path = os.path.join(os.path.join("../bridge/logger/data", dataset_name))
+    for dataset_name in os.listdir("dataset"):
+        dataset_path = os.path.join(os.path.join("dataset", dataset_name))
 
         for idx in range(12):
             dataset_x_data = np.load(os.path.join(dataset_path, "muscle_data.npy"))
-            dataset_x_data_cropped = np.load(os.path.join(dataset_path, "muscle_data_cropped.npy"))
+            # dataset_x_data_cropped = np.load(os.path.join(dataset_path, "muscle_data_cropped.npy"))
 
             dataset_x_data = (dataset_x_data - stuff[idx][0]) / (stuff[idx][1])
-            dataset_x_data_cropped = (dataset_x_data_cropped - stuff_cropped[idx][0]) / (stuff_cropped[idx][1])
+            # dataset_x_data_cropped = (dataset_x_data_cropped - stuff_cropped[idx][0]) / (stuff_cropped[idx][1])
 
             np.save(os.path.join(dataset_path, "muscle_data_normalized.npy"), dataset_x_data)
-            np.save(os.path.join(dataset_path, "muscle_data_cropped_normalized.npy"), dataset_x_data_cropped)
+            # np.save(os.path.join(dataset_path, "muscle_data_cropped_normalized.npy"), dataset_x_data_cropped)
 
 
 def get_normalization_constants():
@@ -95,4 +95,5 @@ def get_normalization_constants():
     return mean, stdevs
 
 
-print(get_normalization_constants())
+# print(get_normalization_constants())
+normalize_x_data()

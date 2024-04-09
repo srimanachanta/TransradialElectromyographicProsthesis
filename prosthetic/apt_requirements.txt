@@ -1,0 +1,4 @@
+libi2c-dev
+i2c-tools
+cmake
+gdb

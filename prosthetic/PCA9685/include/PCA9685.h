@@ -1,7 +1,6 @@
 #pragma once
 
 #include "I2CBus.h"
-#include <string>
 #include <memory>
 
 class PCA9685 {

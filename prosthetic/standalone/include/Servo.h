@@ -2,7 +2,6 @@
 
 #include "PWMChannel.h"
 #include <memory>
-#include <cmath>
 
 class Servo {
 public:

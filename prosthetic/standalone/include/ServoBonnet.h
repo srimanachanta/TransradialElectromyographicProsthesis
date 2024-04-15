@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 #include <PCA9685.h>
 #include "Servo.h"
 

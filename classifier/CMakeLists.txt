@@ -12,15 +12,15 @@ configure_file("src/generate/ModelConfig.in.h" "ModelConfig.h" @ONLY)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_library(classifier INTERFACE)
+file(GLOB SOURCES "src/native/cpp/*.cpp")
+add_library(classifier ${SOURCES})
 target_include_directories(
         classifier
-        INTERFACE
+        PUBLIC
         src/native/include
         ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(classifier INTERFACE "${TORCH_LIBRARIES}")
+target_link_libraries(classifier PUBLIC "${TORCH_LIBRARIES}")
 
-file(GLOB SOURCES "src/native/cpp/*.cpp")
-add_executable(classifier_benchmarker ${SOURCES})
-target_link_libraries(classifier_benchmarker PRIVATE classifier)
+add_executable(classifier_benchmark "src/benchmark.cpp")
+target_link_libraries(classifier_benchmark PRIVATE classifier)

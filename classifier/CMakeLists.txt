@@ -1,12 +1,11 @@
+cmake_minimum_required(VERSION 3.28.1)
 project(classifier)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # Export traced model and weights
 set(CLASSIFIER_TRACED_MODEL_CPU_PATH "${CMAKE_BINARY_DIR}/traced_model_cpu.pt")
-set(CLASSIFIER_TRACED_MODEL_MPS_PATH "${CMAKE_BINARY_DIR}/traced_model_mps.pt")
 configure_file("model_weights/traced_model_cpu.pt" "${CLASSIFIER_TRACED_MODEL_CPU_PATH}" COPYONLY)
-configure_file("model_weights/traced_model_mps.pt" "${CLASSIFIER_TRACED_MODEL_MPS_PATH}" COPYONLY)
 
 configure_file("src/generate/ModelConfig.in.h" "ModelConfig.h" @ONLY)
 

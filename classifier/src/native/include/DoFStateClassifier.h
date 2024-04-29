@@ -34,7 +34,7 @@ public:
     /**
      * Determine the finger muscular force state of each DoF based on measured motor units collected over a
      * uniform time period (1 ksps). Calling this method with non-uniform time periods will significantly reduce
-     * the accuracy of predictions.
+     * the accuracy of predictions. Data should be Float32.
      *
      * @param data
      * @return Returns the predicted classes of the DoFs based on measured motor units.

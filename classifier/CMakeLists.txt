@@ -7,7 +7,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CLASSIFIER_TRACED_MODEL_CPU_PATH "${CMAKE_BINARY_DIR}/traced_model_cpu.pt")
 configure_file("model_weights/traced_model_cpu.pt" "${CLASSIFIER_TRACED_MODEL_CPU_PATH}" COPYONLY)
 
+## Configure the dataset path
+set(DATASET_DIR_PATH "../dataset/")
+cmake_path(ABSOLUTE_PATH DATASET_DIR_PATH NORMALIZE)
+
+# Handle generated files
 configure_file("src/generate/ModelConfig.in.h" "ModelConfig.h" @ONLY)
+configure_file("src/generate/DatasetConfig.in.h" "DatasetConfig.h" @ONLY)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")

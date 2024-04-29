@@ -1,4 +1,6 @@
 import os
+import torch
+
 from dataset import SamplesDataset
 from torch.utils.data import DataLoader, ConcatDataset
 import numpy as np
@@ -71,3 +73,27 @@ def normalize_x_data() -> None:
         normalized_data = (dataset_x_data - per_muscle_coefficients[:, 0]) / per_muscle_coefficients[:, 1]
 
         np.save(os.path.join(dataset_path, "muscle_data_normalized.npy"), normalized_data)
+
+
+def convert_to_tensors_and_save_to_fs():
+    for dataset_name in os.listdir(DATA_ROOT_PATH):
+        dataset_path = os.path.join(os.path.join(DATA_ROOT_PATH, dataset_name))
+
+        dataset_x_data = np.load(os.path.join(dataset_path, "muscle_data.npy"))
+        dataset_x_normalized_data = np.load(os.path.join(dataset_path, "muscle_data_normalized.npy"))
+        dataset_y_data = np.load(os.path.join(dataset_path, "finger_state.npy"))
+
+        class DatasetContainer(torch.nn.Module):
+            def __init__(self, x_data: torch.Tensor, x_data_norm: torch.Tensor, y_data: torch.Tensor):
+                super().__init__()
+                setattr(self, "muscle_data", x_data)
+                setattr(self, "muscle_data_normalized", x_data_norm)
+                setattr(self, "finger_state", y_data)
+
+        dataset_x_data_tensor = torch.from_numpy(dataset_x_data)
+        dataset_x_normalized_data_tensor = torch.from_numpy(dataset_x_normalized_data)
+        dataset_y_data_tensor = torch.from_numpy(dataset_y_data)
+
+        container = torch.jit.script(DatasetContainer(dataset_x_data_tensor, dataset_x_normalized_data_tensor, dataset_y_data_tensor))
+        container.save(os.path.join(dataset_path, "dataset.pt"))
+

@@ -17,7 +17,7 @@ public:
         const torch::jit::script::Module dataset_container = torch::jit::load(dataset_file_path);
 
         this->x_data = dataset_container.attr("muscle_data_normalized").toTensor();
-        this->y_data = dataset_container.attr("finger_state").toTensor();
+        this->y_data = dataset_container.attr("finger_state").toTensor().toType(c10::ScalarType::Int);
     }
 
     [[nodiscard]] size_t size() const {
@@ -25,7 +25,7 @@ public:
     }
 
     [[nodiscard]] torch::Tensor get_item(const int16_t idx) const {
-        return x_data.slice(idx, idx + window_size_samples);
+        return x_data.slice(0, idx, idx + window_size_samples).reshape({1, 512, 12});
     }
 
 private:

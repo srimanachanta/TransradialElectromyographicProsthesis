@@ -27,9 +27,7 @@ struct DoFStateClassification {
  */
 class DoFStateClassifier {
 public:
-    explicit DoFStateClassifier(torch::DeviceType deviceType);
-
-    static torch::DeviceType GetDeviceType();
+    explicit DoFStateClassifier(const std::string&, torch::DeviceType deviceType);
 
     /**
      * Determine the finger muscular force state of each DoF based on measured motor units collected over a

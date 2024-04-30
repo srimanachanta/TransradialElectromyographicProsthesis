@@ -3,11 +3,11 @@ project(classifier)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Export traced model and weights
-set(CLASSIFIER_TRACED_MODEL_CPU_PATH "${CMAKE_BINARY_DIR}/traced_model_cpu.pt")
-configure_file("model_weights/traced_model_cpu.pt" "${CLASSIFIER_TRACED_MODEL_CPU_PATH}" COPYONLY)
-
-## Configure the dataset path
+# Export traced models and datasets
+set(TRACED_FIST_MODEL_PATH "model_weights/fist/traced_model_cpu.pt")
+cmake_path(ABSOLUTE_PATH TRACED_FIST_MODEL_PATH NORMALIZE)
+set(TRACED_SOLO_FINGER_MODEL_PATH "model_weights/solo_finger/traced_model_cpu.pt")
+cmake_path(ABSOLUTE_PATH TRACED_SOLO_FINGER_MODEL_PATH NORMALIZE)
 set(DATASET_DIR_PATH "../dataset/")
 cmake_path(ABSOLUTE_PATH DATASET_DIR_PATH NORMALIZE)
 

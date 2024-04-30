@@ -1,9 +1,10 @@
 #include "native/include/DoFStateClassifier.h"
 
-#include <iostream>
+#include "Dataset.h"
+#include "ModelConfig.h"
 
 int main() {
-    DoFStateClassifier classifier{torch::kCPU};
+    DoFStateClassifier classifier{TRACED_FIST_MODEL_PATH, torch::kCPU};
 
     constexpr int num_samples = 1000;
     std::vector<double> latency_measurements;

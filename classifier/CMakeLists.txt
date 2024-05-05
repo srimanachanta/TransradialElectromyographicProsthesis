@@ -18,6 +18,11 @@ configure_file("src/generate/DatasetConfig.in.h" "DatasetConfig.h" @ONLY)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+find_package(fmt REQUIRED)
+
 file(GLOB SOURCES "src/native/cpp/*.cpp")
 add_library(classifier ${SOURCES})
 target_include_directories(
@@ -26,7 +31,7 @@ target_include_directories(
         src/native/include
         ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(classifier PUBLIC "${TORCH_LIBRARIES}")
+target_link_libraries(classifier PUBLIC ${Boost_LIBRARIES} ${TORCH_LIBRARIES} fmt::fmt-header-only)
 
 add_executable(classifier_benchmark "src/benchmark.cpp")
 target_link_libraries(classifier_benchmark PRIVATE classifier)

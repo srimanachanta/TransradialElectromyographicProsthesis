@@ -2,8 +2,10 @@
 
 #include "Dataset.h"
 #include "ModelConfig.h"
+#include <fmt/format.h>
 
-int main() {
+
+void sample_metrics_test() {
     DoFStateClassifier classifier{TRACED_FIST_MODEL_PATH, torch::kCPU};
 
     constexpr int num_samples = 1000;
@@ -46,4 +48,24 @@ int main() {
     sum = std::accumulate(latency_measurements.begin(), latency_measurements.end(), 0.0);
     mean = sum / static_cast<double>(latency_measurements.size());
     std::cout << "Avg (ms): " << mean << std::endl;
+}
+
+void prosthetic_data_pipeline_test() {
+    Dataset dataset{"fist"};
+    // Dataset dataset{"solo_finger"};
+
+    DoFStateClassifier classifier{TRACED_FIST_MODEL_PATH, torch::kCPU};
+    // DoFStateClassifier classifier{TRACED_SOLO_FINGER_MODEL_PATH, torch::kCPU};
+
+    for(int i = 0; i < dataset.size(); i+= 15) {
+        const auto data = dataset.get_item(i);
+        const auto pred_states = classifier.Classify(data);
+
+        fmt::print("{}, {}\n", i, pred_states);
+    }
+}
+
+int main() {
+        // sample_metrics_test();
+    prosthetic_data_pipeline_test();
 }

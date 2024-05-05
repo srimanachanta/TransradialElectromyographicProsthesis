@@ -1,6 +1,7 @@
 #pragma once
 
 #include <torch/script.h>
+#include <fmt/core.h>
 
 /**
  * Class references of the classifier. Represents the muscular state of each major DoF of the hand.
@@ -18,6 +19,53 @@ struct DoFStateClassification {
     DoFForce ring;
     DoFForce little;
     DoFForce wrist;
+
+    bool operator==(const DoFStateClassification& other) const {
+        return this->thumb == other.thumb
+            && this->index == other.index
+            && this->middle == other.middle
+            && this->ring == other.ring
+            && this->little == other.little
+            && this->wrist == other.wrist;
+    }
+
+    bool operator!=(const DoFStateClassification& other) const {
+        return this->thumb != other.thumb
+            || this->index != other.index
+            || this->middle != other.middle
+            || this->ring != other.ring
+            || this->little != other.little
+            || this->wrist != other.wrist;
+    }
+};
+
+template <>
+struct fmt::formatter<DoFForce> {
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const DoFForce& f, FormatContext& ctx) {
+        switch(f) {
+            case kNoMovement:
+                return format_to(ctx.out(), "NoMovement");
+            case kExtending:
+                return format_to(ctx.out(), "Extending");
+            case kFlexing:
+                return format_to(ctx.out(), "Flexing");
+        }
+        return format_to(ctx.out(), "Unknown");
+    }
+};
+
+template <>
+struct fmt::formatter<DoFStateClassification> {
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const DoFStateClassification& d, FormatContext& ctx) {
+        return format_to(ctx.out(), "{{thumb: {}, index: {}, middle: {}, ring: {}, little: {}, wrist: {}}}",
+                         d.thumb, d.index, d.middle, d.ring, d.little, d.wrist);
+    }
 };
 
 /**

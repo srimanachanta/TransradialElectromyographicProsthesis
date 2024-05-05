@@ -8,13 +8,14 @@
  * https://github.com/barulicm/PiPCA9685/blob/master/src/I2CPeripheral.cpp
  */
 class I2CBus {
-public:
-    explicit I2CBus(const char *bus_filename, int address);
+ public:
+  explicit I2CBus(const char* bus_filename, int address);
 
-    [[nodiscard]] uint8_t ReadByte(int command) const;
+  [[nodiscard]]
+  uint8_t ReadByte(int command) const;
 
-    void WriteByte(int command, uint8_t data) const;
+  void WriteByte(int command, uint8_t data) const;
 
-private:
-    int bus_fd;
+ private:
+  int bus_fd;
 };

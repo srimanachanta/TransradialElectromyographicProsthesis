@@ -2,14 +2,17 @@
 #include <torch/torch.h>
 
 class DataNotAvailableException final : public std::exception {
-    [[nodiscard]] const char* what() const noexcept override {
-        return "EMGDataProvider is unable to provide data.";
-    }
+  [[nodiscard]]
+  const char* what() const noexcept override {
+    return "EMGDataProvider is unable to provide data.";
+  }
 };
 
 /**
- * Virtual class describing a source of live or retro-lib EMG data streams collected from 12 discrete electrodes.
- * Each source is responsible for synchronizing data to 1 ksps (this is done to handle low-level API performance for onboard capture sources).
+ * Virtual class describing a source of live or retro-lib EMG data streams
+ * collected from 12 discrete electrodes. Each source is responsible for
+ * synchronizing data to 1 ksps (this is done to handle low-level API
+ * performance for onboard capture sources).
  *
  * Channel specifications are as follows:
  * 1. Flexor Digitorum Superficialis
@@ -26,8 +29,8 @@ class DataNotAvailableException final : public std::exception {
  * 12. Extensor Carpi Radialis Longus
  */
 class EMGDataProvider {
-public:
-    virtual ~EMGDataProvider() = default;
+ public:
+  virtual ~EMGDataProvider() = default;
 
-    virtual torch::Tensor GetDataFrame() noexcept(false) = 0;
+  virtual torch::Tensor GetDataFrame() noexcept(false) = 0;
 };

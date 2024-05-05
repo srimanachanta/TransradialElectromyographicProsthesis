@@ -5,16 +5,16 @@
 #include <memory>
 
 class PWMChannel {
-public:
-    explicit PWMChannel(uint8_t channel, std::shared_ptr<PCA9685> pca);
+ public:
+  explicit PWMChannel(uint8_t channel, std::shared_ptr<PCA9685> pca);
 
-    uint16_t GetFrequency();
+  [[nodiscard]] uint16_t GetFrequency() const;
 
-    uint16_t GetDutyCycle();
+  [[nodiscard]] uint16_t GetDutyCycle() const;
 
-    void SetDutyCycle(uint16_t duty_cycle);
+  void SetDutyCycle(uint16_t duty_cycle) const;
 
-private:
-    uint8_t channel;
-    std::shared_ptr<PCA9685> pca;
+ private:
+  uint8_t channel;
+  std::shared_ptr<PCA9685> pca;
 };

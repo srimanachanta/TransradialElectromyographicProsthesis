@@ -4,20 +4,21 @@
 #include <memory>
 
 class Servo {
-public:
-    explicit Servo(std::unique_ptr<PWMChannel> channel, double mechanicalRange);
+ public:
+  explicit Servo(std::unique_ptr<PWMChannel> channel, double mechanicalRange);
 
-    void SetPulseWidthRange(uint16_t min_pulse_microseconds, uint16_t max_pulse_microseconds);
+  void SetPulseWidthRange(uint16_t min_pulse_microseconds,
+                          uint16_t max_pulse_microseconds);
 
-    double GetAngle();
+  [[nodiscard]] double GetAngle() const;
 
-    void SetAngle(double angle_rad);
+  void SetAngle(double angle_rad) const;
 
-private:
-    std::unique_ptr<PWMChannel> channel;
+ private:
+  std::unique_ptr<PWMChannel> channel;
 
-    double mechanicalRange;
-    double minDuty{};
-    double maxDuty{};
-    double dutyRange{};
+  double mechanicalRange;
+  double minDuty{};
+  double maxDuty{};
+  double dutyRange{};
 };

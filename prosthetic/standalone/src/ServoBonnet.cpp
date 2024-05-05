@@ -1,4 +1,5 @@
 #include "ServoBonnet.h"
+#include <cmath>
 
 ServoBonnet::ServoBonnet(const char *bus_filename, int channel) {
     pca = std::make_shared<PCA9685>(bus_filename, channel);

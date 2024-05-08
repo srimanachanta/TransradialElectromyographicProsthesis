@@ -25,11 +25,11 @@ class Dataset {
 
   [[nodiscard]]
   size_t size() const {
-    return x_data.sizes()[0] - window_size_samples + 1;
+    return x_data.sizes()[0] - window_size_samples;
   }
 
   [[nodiscard]]
-  torch::Tensor get_item(const int16_t idx) const {
+  torch::Tensor get_item(const uint16_t idx) const {
     return x_data.slice(0, idx, idx + window_size_samples)
         .reshape({1, 512, 12});
   }

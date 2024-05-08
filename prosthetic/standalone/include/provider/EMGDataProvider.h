@@ -1,13 +1,6 @@
 #pragma once
 #include <torch/torch.h>
 
-class DataNotAvailableException final : public std::exception {
-  [[nodiscard]]
-  const char* what() const noexcept override {
-    return "EMGDataProvider is unable to provide data.";
-  }
-};
-
 /**
  * Virtual class describing a source of live or retro-lib EMG data streams
  * collected from 12 discrete electrodes. Each source is responsible for
@@ -31,6 +24,8 @@ class DataNotAvailableException final : public std::exception {
 class EMGDataProvider {
  public:
   virtual ~EMGDataProvider() = default;
+
+  virtual bool HasData() = 0;
 
   virtual torch::Tensor GetDataFrame() noexcept(false) = 0;
 };

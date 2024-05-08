@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <PCA9685.h>
+#include "ProstheticServoDriver.h"
 #include <memory>
 
 class PWMChannel {

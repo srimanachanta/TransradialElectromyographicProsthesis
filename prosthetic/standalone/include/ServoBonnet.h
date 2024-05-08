@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <PCA9685.h>
+#include "ProstheticServoDriver.h"
 #include "Servo.h"
 
 class ServoBonnet {

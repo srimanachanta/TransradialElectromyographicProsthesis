@@ -7,11 +7,9 @@
 class ReplayEMGDataProvider final : EMGDataProvider {
  public:
   explicit ReplayEMGDataProvider(const std::string& dataset_name)
-      : dataset(dataset_name) {};
+      : dataset(dataset_name){};
 
-  bool HasData() override {
-    return index < dataset.size();
-  }
+  bool HasData() override { return index < dataset.size(); }
 
   torch::Tensor GetDataFrame() noexcept(false) override {
     if (first_time) {
@@ -25,14 +23,17 @@ class ReplayEMGDataProvider final : EMGDataProvider {
     auto const currentTime =
         std::chrono::time_point_cast<std::chrono::microseconds>(
             std::chrono::steady_clock::now());
-    auto const deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                              currentTime - lastTime)
-                              .count();
+    auto const deltaTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(currentTime -
+                                                              lastTime)
+            .count();
     lastTime = currentTime;
 
-    index += std::min(std::max(static_cast<uint16_t>(deltaTime), static_cast<uint16_t>(1)), max_latency);
+    index += std::min(
+        std::max(static_cast<uint16_t>(deltaTime), static_cast<uint16_t>(1)),
+        max_latency);
 
-    if(index > dataset.size()) {
+    if (index > dataset.size()) {
       index = dataset.size();
       return dataset.get_item(dataset.size() - 1);
     }

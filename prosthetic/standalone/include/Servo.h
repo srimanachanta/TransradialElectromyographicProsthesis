@@ -10,7 +10,8 @@ class Servo {
   void SetPulseWidthRange(uint16_t min_pulse_microseconds,
                           uint16_t max_pulse_microseconds);
 
-  [[nodiscard]] double GetAngle() const;
+  [[nodiscard]]
+  double GetAngle() const;
 
   void SetAngle(double angle_rad) const;
 

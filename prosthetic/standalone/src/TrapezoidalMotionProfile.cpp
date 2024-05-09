@@ -6,13 +6,15 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
     const double period, State measuredState, State goalState) const {
   int m_direction = 1;
 
-  if(std::abs(measuredState.position - goalState.position) < 0.05) {
+  if (std::abs(measuredState.position - goalState.position) < 0.05) {
     return goalState;
   }
-  if(measuredState.position > goalState.position) {
+  if (measuredState.position > goalState.position) {
     m_direction = -1;
   }
-  return {measuredState.position + (constraints.maxVelocity * period * m_direction), 0};
+  return {
+      measuredState.position + (constraints.maxVelocity * period * m_direction),
+      0};
 
   // // Determine if the profile is flipped
   // if (measuredState.position > goalState.position) {
@@ -26,8 +28,8 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
   // }
   //
   // // Handle truncated motion profile where V0 or Vf is non-zero. Do this by
-  // // solving predicted initial and final parameters. T = V/A Distance = 1/2at^2
-  // const double truncatedProfileStartTime =
+  // // solving predicted initial and final parameters. T = V/A Distance =
+  // 1/2at^2 const double truncatedProfileStartTime =
   //     measuredState.velocity / constraints.maxAcceleration;
   // const double truncatedProfileStartDistance =
   //     (constraints.maxAcceleration / 2.0) *
@@ -50,11 +52,12 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
   //
   // // Handle the case where the profile never reaches full speed
   // if (fullSpeedDistance < 0) {
-  //   maxAccelerationTime = std::sqrt(fullDistance / constraints.maxAcceleration);
-  //   fullSpeedDistance = 0;
+  //   maxAccelerationTime = std::sqrt(fullDistance /
+  //   constraints.maxAcceleration); fullSpeedDistance = 0;
   // }
   //
-  // // Calculate the times of the vertices of the profile (start accel, end accel,
+  // // Calculate the times of the vertices of the profile (start accel, end
+  // accel,
   // // end speed, end Deccel)
   // const double endAccelerationTime =
   //     maxAccelerationTime - truncatedProfileStartTime;
@@ -63,7 +66,8 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
   // const double endDeccelTime =
   //     endFullSpeedTime + maxAccelerationTime - truncatedProfileEndTime;
   //
-  // // Based on the current time in the profile in the profile, apply the speeds
+  // // Based on the current time in the profile in the profile, apply the
+  // speeds
   // // to the current state to form the setpoint state.
   // State setpoint{measuredState.position, measuredState.velocity};
   //
@@ -71,8 +75,8 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
   // if (period < endAccelerationTime) {
   //   setpoint.velocity += period * constraints.maxAcceleration;
   //   setpoint.position +=
-  //       (measuredState.velocity + period * constraints.maxAcceleration / 2.0) *
-  //       period;
+  //       (measuredState.velocity + period * constraints.maxAcceleration / 2.0)
+  //       * period;
   // } else if (period < endFullSpeedTime) {
   //   setpoint.velocity = constraints.maxVelocity;
   //   setpoint.position +=
@@ -82,7 +86,8 @@ TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
   //       constraints.maxVelocity * (period - endAccelerationTime);
   // } else if (period <= endDeccelTime) {
   //   setpoint.velocity = goalState.velocity +
-  //                       (endDeccelTime - period) * constraints.maxAcceleration;
+  //                       (endDeccelTime - period) *
+  //                       constraints.maxAcceleration;
   //   const double timeLeft = endDeccelTime - period;
   //   setpoint.position =
   //       goalState.position -

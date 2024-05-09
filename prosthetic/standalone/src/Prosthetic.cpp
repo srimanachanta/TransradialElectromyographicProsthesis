@@ -14,26 +14,23 @@ Prosthetic::JointPositions ServoPositionsToJointPositions(
   return Prosthetic::JointPositions{};
 }
 
-Prosthetic::JointPositions Prosthetic::GetCurrentBufferedPositions() const{
+Prosthetic::JointPositions Prosthetic::GetCurrentBufferedPositions() const {
   return currentPositions;
 }
 
 Prosthetic::JointPositions Prosthetic::GetCurrentTruePositions() {
   const ServoPositions currentServoPositions{
-      controller.GetServo(0)->GetAngle(), controller.GetServo(1)->GetAngle(),
-      controller.GetServo(2)->GetAngle(), controller.GetServo(3)->GetAngle(),
-      controller.GetServo(4)->GetAngle(), controller.GetServo(5)->GetAngle(),
-      controller.GetServo(6)->GetAngle(), controller.GetServo(7)->GetAngle(),
-      controller.GetServo(8)->GetAngle(), controller.GetServo(9)->GetAngle(),
-      controller.GetServo(10)->GetAngle(),
-      controller.GetServo(11)->GetAngle(),
-      controller.GetServo(12)->GetAngle(),
-      controller.GetServo(13)->GetAngle(),
+      controller.GetServo(0)->GetAngle(),  controller.GetServo(1)->GetAngle(),
+      controller.GetServo(2)->GetAngle(),  controller.GetServo(3)->GetAngle(),
+      controller.GetServo(4)->GetAngle(),  controller.GetServo(5)->GetAngle(),
+      controller.GetServo(6)->GetAngle(),  controller.GetServo(7)->GetAngle(),
+      controller.GetServo(8)->GetAngle(),  controller.GetServo(9)->GetAngle(),
+      controller.GetServo(10)->GetAngle(), controller.GetServo(11)->GetAngle(),
+      controller.GetServo(12)->GetAngle(), controller.GetServo(13)->GetAngle(),
       controller.GetServo(14)->GetAngle()};
 
   return ServoPositionsToJointPositions(currentServoPositions);
 }
-
 
 void Prosthetic::SetJointGoalPositions(const JointPositions& positions) {
   std::lock_guard<std::mutex> lock(control_mutex);
@@ -188,7 +185,7 @@ void Prosthetic::Periodic() {
   // standard control theory assumptions because they converge instantly.
   currentPositions = setpointPositions;
 
-  if(OUTPUT_TO_PROSTHETIC) {
+  if (OUTPUT_TO_PROSTHETIC) {
     // Form the servo positions from the joint positions
     auto const outputPositions =
         JointPositionsToServoPositions(setpointPositions);
@@ -211,16 +208,16 @@ void Prosthetic::Periodic() {
     controller.GetServo(14)->SetAngle(outputPositions.littlePitchRad);
   } else {
     fmt::print("{}, {}\n{}, {}\n{}, {}\n{}, {}\n{}, {}\n\n",
-           setpointPositions.thumbMetacarpalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.thumbProximalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.indexMetacarpalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.indexProximalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.middleMetacarpalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.middleProximalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.ringMetacarpalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.ringProximalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.littleMetacarpalPitchAngleRad * (180.0 / M_PI),
-           setpointPositions.littleProximalPitchAngleRad * (180.0 / M_PI));
+               setpointPositions.thumbMetacarpalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.thumbProximalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.indexMetacarpalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.indexProximalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.middleMetacarpalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.middleProximalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.ringMetacarpalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.ringProximalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.littleMetacarpalPitchAngleRad * (180.0 / M_PI),
+               setpointPositions.littleProximalPitchAngleRad * (180.0 / M_PI));
   }
 }
 

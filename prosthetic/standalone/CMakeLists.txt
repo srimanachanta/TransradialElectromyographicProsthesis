@@ -15,7 +15,7 @@ target_include_directories(standalone_prosthetic PRIVATE include)
 target_link_libraries(standalone_prosthetic PRIVATE ${Boost_LIBRARIES} classifier)
 
 if(ENABLE_PROSTHETIC)
-    message("ENABLE_PROSTHETIC==ON Linking PCA Driver")
+    message("-- ENABLE_PROSTHETIC=ON: Linking PCA Driver to Edge Application")
     add_definitions(-DPROSTHETIC_ENABLED)
     target_link_libraries(standalone_prosthetic PRIVATE PCA9685_driver)
 endif()

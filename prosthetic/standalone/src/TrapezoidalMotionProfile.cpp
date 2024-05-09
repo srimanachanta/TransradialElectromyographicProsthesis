@@ -4,6 +4,7 @@
 
 TrapezoidalMotionProfile::State TrapezoidalMotionProfile::Calculate(
     const double period, State measuredState, State goalState) const {
+  // TODO refactor this stuff into a motion profile generator
   int m_direction = 1;
 
   if (std::abs(measuredState.position - goalState.position) < 0.05) {

@@ -1,27 +1,37 @@
+cmake_minimum_required(VERSION 3.28.1)
 project(classifier)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Export traced model and weights
-set(CLASSIFIER_TRACED_MODEL_CPU_PATH "${CMAKE_BINARY_DIR}/traced_model_cpu.pt")
-set(CLASSIFIER_TRACED_MODEL_MPS_PATH "${CMAKE_BINARY_DIR}/traced_model_mps.pt")
-configure_file("model_weights/traced_model_cpu.pt" "${CLASSIFIER_TRACED_MODEL_CPU_PATH}" COPYONLY)
-configure_file("model_weights/traced_model_mps.pt" "${CLASSIFIER_TRACED_MODEL_MPS_PATH}" COPYONLY)
+# Export traced models and datasets
+set(TRACED_FIST_MODEL_PATH "model_weights/fist/traced_model_cpu.pt")
+cmake_path(ABSOLUTE_PATH TRACED_FIST_MODEL_PATH NORMALIZE)
+set(TRACED_SOLO_FINGER_MODEL_PATH "model_weights/solo_finger/traced_model_cpu.pt")
+cmake_path(ABSOLUTE_PATH TRACED_SOLO_FINGER_MODEL_PATH NORMALIZE)
+set(DATASET_DIR_PATH "../dataset/")
+cmake_path(ABSOLUTE_PATH DATASET_DIR_PATH NORMALIZE)
 
+# Handle generated files
 configure_file("src/generate/ModelConfig.in.h" "ModelConfig.h" @ONLY)
+configure_file("src/generate/DatasetConfig.in.h" "DatasetConfig.h" @ONLY)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_library(classifier INTERFACE)
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+find_package(fmt REQUIRED)
+
+file(GLOB SOURCES "src/native/cpp/*.cpp")
+add_library(classifier ${SOURCES})
 target_include_directories(
         classifier
-        INTERFACE
+        PUBLIC
         src/native/include
         ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(classifier INTERFACE "${TORCH_LIBRARIES}")
+target_link_libraries(classifier PUBLIC ${Boost_LIBRARIES} ${TORCH_LIBRARIES} fmt::fmt-header-only)
 
-file(GLOB SOURCES "src/native/cpp/*.cpp")
-add_executable(classifier_benchmarker ${SOURCES})
-target_link_libraries(classifier_benchmarker PRIVATE classifier)
+add_executable(classifier_benchmark "src/benchmark.cpp")
+target_link_libraries(classifier_benchmark PRIVATE classifier)

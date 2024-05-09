@@ -16,5 +16,6 @@ target_link_libraries(standalone_prosthetic PRIVATE ${Boost_LIBRARIES} classifie
 
 if(ENABLE_PROSTHETIC)
     message("ENABLE_PROSTHETIC==ON Linking PCA Driver")
+    add_definitions(-DPROSTHETIC_ENABLED)
     target_link_libraries(standalone_prosthetic PRIVATE PCA9685_driver)
 endif()

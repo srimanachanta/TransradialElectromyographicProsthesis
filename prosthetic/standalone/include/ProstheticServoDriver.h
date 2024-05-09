@@ -1,10 +1,13 @@
 #ifndef PROSTHETICSERVODRIVER_H
 #define PROSTHETICSERVODRIVER_H
 
-#if defined(ENABLE_PROSTHETIC)
+#ifdef PROSTHETIC_ENABLED
+#define OUTPUT_TO_PROSTHETIC true
 #include <PCA9685.h>
 #else
+#define OUTPUT_TO_PROSTHETIC false
 #include <utility>
+#include <cstdint>
 
 class PCA9685 {
  public:

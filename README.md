@@ -17,19 +17,23 @@ research-grade prosthetics and 15 times that of commercial-grade ones. Additiona
 grasp speed of over three times faster than other state-of-the-art prosthetics and is comparable in weight to the human
 hand.
 
+### Mechanical Prosthetic
+[CAD Model of the Prosthetic Hand](https://cad.onshape.com/documents/2ea8d5879b88db8517321d66/w/1d11a637770cdf9383771270/e/bccacbcaf468f3d39d1c2138?configuration=List_4yIkpjvenae8wc%3DDefault&renderMode=0&uiState=663f264aacd2df0055ba8e96)
+
+
 ### Code Description
 
-The control algorithms for the prosthetic are run on an Orange Pi Zero2W. Data is collected from a EMGDataProvider then
-fed into a 512 element circular buffer. Data from the buffer is then fed into the EMGDataClassifier which returns
+The control algorithms for the prosthetic are run on an Orange Pi Zero2W. Data is collected from an EMGDataProvider and then
+fed into a 512-element circular buffer. Data from the buffer is then fed into the EMGDataClassifier which returns
 directional classifications of each finger. These classifications are then used as a part of control algorithms which
 determine the position of the finger given a constant velocity and acceleration, and a known starting position. To
-account for inconsistencies in predictions, trapezoidal motion profiles were implemented to smooth motion of the servos
-and the prosthetic. Outputed joint positions were then converted to servo positions using high order inverse kinematics
+account for inconsistencies in predictions, trapezoidal motion profiles were implemented to smooth the motion of the servos
+and the prosthetic. Output joint positions were then converted to servo positions using high-order inverse kinematics
 before being sent to the physical prosthetic using a PCA9685 control board.
 
 Custom drivers were implemented for the servo controller board (using
-Linux's [I2C component](https://www.kernel.org/doc/html/v4.9/driver-api/i2c.html)) found in the `PCA9686` package. The ML model was created in Python using PyTorch then traced using TorchScript before being
-reloaded using libtorch into the `classifier` library. Collection of data and finger state prediction was seperated from
+Linux's [I2C component](https://www.kernel.org/doc/html/v4.9/driver-api/i2c.html)) found in the `PCA9686` package. The ML model was created in Python using PyTorch and then traced using TorchScript before being
+reloaded using LibTorch into the `classifier` library. The collection of data and finger state prediction were separated from
 the mechanical control algorithms into discrete threads in the `standalone` package.
 
 ### Dependencies
@@ -42,7 +46,7 @@ numpy==1.26.3
 ```
 
 The OrangePi Zero2W runs Armbian.
-The following dependencies were used on board and for the C++ control code:
+The following dependencies were used on board and for the C++ control code. Use Miniforge3 for any dependencies not up-to-date on apt:
 
 ```requirements
 i2c-tools==4.3-2+b3
@@ -65,10 +69,15 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja -DCMAKE_C_C
 cmake --build /home/prosthetic/pytorch/build --target install -- -j 2
 ```
 
-The following procedure was used to modify I2C clock-frequency for the PCA driver. This was needed to smooth servo motion.
+The following procedure was used to modify the I2C clock frequency for the PCA driver. This was needed to smooth servo motion.
 ```shell
+# Decompile the device tree binary
 dtc -I dtb -O dts sun50i-h618-orangepi-zero2w.dtb -o sun50i-h618-orangepi-zero2w.dts
 sudo nano sun50i-h618-orangepi-zero2w.dts
+# Find the appropriate I2C bus node and modify it by adding the following line. For I2C Bus 1 (i2c-1, pins 7,8) use i2c@5002400.
 clock-frequency=<400000>
+# Recompile the device tree binary
 dts -O dtb sun50i-h618-orangepi-zero2w.dts -o sun50i-h618-orangepi-zero2w.dtb
+# Reboot for changes to take effect
+sudo reboot
 ```

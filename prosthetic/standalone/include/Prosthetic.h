@@ -10,7 +10,6 @@
 class Prosthetic {
  public:
   struct JointPositions {
-    double thumbMetacarpalYawAngleRad;
     double thumbMetacarpalPitchAngleRad;
     double thumbProximalPitchAngleRad;
 
@@ -34,9 +33,8 @@ class Prosthetic {
   };
 
   struct ServoPositions {
-    double thumbMetacarpalLeftRad;
-    double thumbMetacarpalRightRad;
-    double thumbPitchRad;
+    double thumbProximalPitchRad;
+    double thumbMetacarpalPitchRad;
 
     double indexMetacarpalLeftRad;
     double indexMetacarpalRightRad;

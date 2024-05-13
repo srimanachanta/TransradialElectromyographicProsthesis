@@ -26,8 +26,7 @@ Prosthetic::JointPositions Prosthetic::GetCurrentTruePositions() {
       controller.GetServo(6)->GetAngle(),  controller.GetServo(7)->GetAngle(),
       controller.GetServo(8)->GetAngle(),  controller.GetServo(9)->GetAngle(),
       controller.GetServo(10)->GetAngle(), controller.GetServo(11)->GetAngle(),
-      controller.GetServo(12)->GetAngle(), controller.GetServo(13)->GetAngle(),
-      controller.GetServo(14)->GetAngle()};
+      controller.GetServo(12)->GetAngle(), controller.GetServo(13)->GetAngle()};
 
   return ServoPositionsToJointPositions(currentServoPositions);
 }
@@ -45,14 +44,6 @@ void Prosthetic::Periodic() {
   {
     std::lock_guard<std::mutex> lock(control_mutex);
 
-    setpointPositions.thumbMetacarpalYawAngleRad =
-        thumbMetacarpalYawMotionProfile
-            .Calculate(deltaTimeSeconds,
-                       TrapezoidalMotionProfile::State{
-                           currentPositions.thumbMetacarpalYawAngleRad, 0},
-                       TrapezoidalMotionProfile::State{
-                           goalPositions.thumbMetacarpalYawAngleRad, 0})
-            .position;
     setpointPositions.thumbMetacarpalPitchAngleRad =
         thumbMetacarpalPitchMotionProfile
             .Calculate(deltaTimeSeconds,
@@ -191,21 +182,20 @@ void Prosthetic::Periodic() {
         JointPositionsToServoPositions(setpointPositions);
 
     // Apply output positions to the physical servos
-    controller.GetServo(0)->SetAngle(outputPositions.thumbMetacarpalLeftRad);
-    controller.GetServo(1)->SetAngle(outputPositions.thumbMetacarpalRightRad);
-    controller.GetServo(2)->SetAngle(outputPositions.thumbPitchRad);
-    controller.GetServo(3)->SetAngle(outputPositions.indexMetacarpalLeftRad);
-    controller.GetServo(4)->SetAngle(outputPositions.indexMetacarpalRightRad);
-    controller.GetServo(5)->SetAngle(outputPositions.indexPitchRad);
-    controller.GetServo(6)->SetAngle(outputPositions.middleMetacarpalLeftRad);
-    controller.GetServo(7)->SetAngle(outputPositions.middleMetacarpalRightRad);
-    controller.GetServo(8)->SetAngle(outputPositions.middlePitchRad);
-    controller.GetServo(9)->SetAngle(outputPositions.ringMetacarpalLeftRad);
-    controller.GetServo(10)->SetAngle(outputPositions.ringMetacarpalRightRad);
-    controller.GetServo(11)->SetAngle(outputPositions.ringPitchRad);
-    controller.GetServo(12)->SetAngle(outputPositions.littleMetacarpalLeftRad);
-    controller.GetServo(13)->SetAngle(outputPositions.littleMetacarpalRightRad);
-    controller.GetServo(14)->SetAngle(outputPositions.littlePitchRad);
+    controller.GetServo(0)->SetAngle(outputPositions.thumbMetacarpalPitchRad);
+    controller.GetServo(1)->SetAngle(outputPositions.thumbProximalPitchRad);
+    controller.GetServo(2)->SetAngle(outputPositions.indexMetacarpalLeftRad);
+    controller.GetServo(3)->SetAngle(outputPositions.indexMetacarpalRightRad);
+    controller.GetServo(4)->SetAngle(outputPositions.indexPitchRad);
+    controller.GetServo(5)->SetAngle(outputPositions.middleMetacarpalLeftRad);
+    controller.GetServo(6)->SetAngle(outputPositions.middleMetacarpalRightRad);
+    controller.GetServo(7)->SetAngle(outputPositions.middlePitchRad);
+    controller.GetServo(8)->SetAngle(outputPositions.ringMetacarpalLeftRad);
+    controller.GetServo(9)->SetAngle(outputPositions.ringMetacarpalRightRad);
+    controller.GetServo(10)->SetAngle(outputPositions.ringPitchRad);
+    controller.GetServo(11)->SetAngle(outputPositions.littleMetacarpalLeftRad);
+    controller.GetServo(12)->SetAngle(outputPositions.littleMetacarpalRightRad);
+    controller.GetServo(13)->SetAngle(outputPositions.littlePitchRad);
   } else {
     fmt::print("{}, {}\n{}, {}\n{}, {}\n{}, {}\n{}, {}\n\n",
                setpointPositions.thumbMetacarpalPitchAngleRad * (180.0 / M_PI),

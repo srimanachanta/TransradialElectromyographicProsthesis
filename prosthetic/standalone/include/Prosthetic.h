@@ -58,7 +58,7 @@ class Prosthetic {
 
   void SetJointGoalPositions(const JointPositions& positions);
 
-  JointPositions GetCurrentBufferedPositions() const;
+  [[nodiscard]] JointPositions GetCurrentBufferedPositions() const;
   JointPositions GetCurrentTruePositions();
 
   void Stop() { running = false; }

@@ -25,10 +25,10 @@ int main() {
     Prosthetic::JointPositions goalPositions{};
     auto const currentPositions = prosthetic.GetCurrentBufferedPositions();
 
-    if (state.thumb == kExtending) {
+    if (state.thumb == kFlexing) {
       goalPositions.thumbMetacarpalPitchAngleRad = M_PI_2;
       goalPositions.thumbProximalPitchAngleRad = M_PI_2;
-    } else if (state.thumb == kFlexing) {
+    } else if (state.thumb == kExtending) {
       goalPositions.thumbMetacarpalPitchAngleRad = 0;
       goalPositions.thumbProximalPitchAngleRad = 0;
     } else {
@@ -38,10 +38,10 @@ int main() {
           currentPositions.thumbProximalPitchAngleRad;
     }
 
-    if (state.index == kExtending) {
+    if (state.index == kFlexing) {
       goalPositions.indexMetacarpalPitchAngleRad = M_PI_2;
       goalPositions.indexProximalPitchAngleRad = M_PI_2;
-    } else if (state.index == kFlexing) {
+    } else if (state.index == kExtending) {
       goalPositions.indexMetacarpalPitchAngleRad = 0;
       goalPositions.indexProximalPitchAngleRad = 0;
     } else {
@@ -51,10 +51,10 @@ int main() {
           currentPositions.indexProximalPitchAngleRad;
     }
 
-    if (state.middle == kExtending) {
+    if (state.middle == kFlexing) {
       goalPositions.middleMetacarpalPitchAngleRad = M_PI_2;
       goalPositions.middleProximalPitchAngleRad = M_PI_2;
-    } else if (state.middle == kFlexing) {
+    } else if (state.middle == kExtending) {
       goalPositions.middleMetacarpalPitchAngleRad = 0;
       goalPositions.middleProximalPitchAngleRad = 0;
     } else {
@@ -64,10 +64,10 @@ int main() {
           currentPositions.middleProximalPitchAngleRad;
     }
 
-    if (state.ring == kExtending) {
+    if (state.ring == kFlexing) {
       goalPositions.ringMetacarpalPitchAngleRad = M_PI_2;
       goalPositions.ringProximalPitchAngleRad = M_PI_2;
-    } else if (state.ring == kFlexing) {
+    } else if (state.ring == kExtending) {
       goalPositions.ringMetacarpalPitchAngleRad = 0;
       goalPositions.ringProximalPitchAngleRad = 0;
     } else {
@@ -77,10 +77,10 @@ int main() {
           currentPositions.ringProximalPitchAngleRad;
     }
 
-    if (state.little == kExtending) {
+    if (state.little == kFlexing) {
       goalPositions.littleMetacarpalPitchAngleRad = M_PI_2;
       goalPositions.littleProximalPitchAngleRad = M_PI_2;
-    } else if (state.little == kFlexing) {
+    } else if (state.little == kExtending) {
       goalPositions.littleMetacarpalPitchAngleRad = 0;
       goalPositions.littleProximalPitchAngleRad = 0;
     } else {

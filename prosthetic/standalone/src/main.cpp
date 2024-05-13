@@ -10,8 +10,12 @@ int main() {
   NativeMLEMGDataClassifier classifier{TRACED_FIST_MODEL_PATH};
   // NativeMLEMGDataClassifier classifier{TRACED_SOLO_FINGER_MODEL_PATH};
 
-  Prosthetic prosthetic{{0, M_PI_2, M_PI_2, 0, M_PI_2, M_PI_2, 0, M_PI_2,
-                         M_PI_2, 0, M_PI_2, M_PI_2, 0, M_PI_2, M_PI_2, M_PI_2}};
+  // constexpr Prosthetic::JointPositions initalPositions{};
+  constexpr Prosthetic::JointPositions initalPositions{
+      M_PI_2, M_PI_2, 0,      M_PI_2, M_PI_2, 0,      M_PI_2, M_PI_2,
+      0,      M_PI_2, M_PI_2, 0,      M_PI_2, M_PI_2, 0};
+
+  Prosthetic prosthetic{initalPositions};
 
   while (provider.HasData()) {
     const torch::Tensor emg_data = provider.GetDataFrame();

@@ -39,8 +39,8 @@ Prosthetic::ServoPositions JointPositionsToServoPositions(
 
   Prosthetic::ServoPositions outputPositions{};
 
-  outputPositions.thumbProximalPitchRad =
-      map(positions.thumbProximalPitchAngleRad, 0, M_PI_2, 0, 160 * (M_PI / 180.0));
+  outputPositions.thumbProximalPitchRad = map(
+      positions.thumbProximalPitchAngleRad, 0, M_PI_2, 0, 160 * (M_PI / 180.0));
   outputPositions.indexPitchRad = map(positions.indexProximalPitchAngleRad, 0,
                                       M_PI_2, M_PI, 50 * (M_PI / 180.0));
   outputPositions.middlePitchRad = map(positions.middleProximalPitchAngleRad, 0,
@@ -53,7 +53,8 @@ Prosthetic::ServoPositions JointPositionsToServoPositions(
   // TODO create a dynamical model for the yaw angle of the metacarpal joint
 
   outputPositions.thumbMetacarpalPitchRad =
-      map(positions.thumbMetacarpalPitchAngleRad, 0, M_PI_2, M_PI, 80 * (M_PI / 180.0));
+      map(positions.thumbMetacarpalPitchAngleRad, 0, M_PI_2, M_PI,
+          80 * (M_PI / 180.0));
 
   outputPositions.indexMetacarpalLeftRad =
       map(positions.indexMetacarpalPitchAngleRad, 0, M_PI_2,
@@ -70,11 +71,11 @@ Prosthetic::ServoPositions JointPositionsToServoPositions(
           140 * (M_PI / 180.0));
 
   outputPositions.ringMetacarpalLeftRad =
-      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2, 175 * (M_PI / 180.0),
-          40 * (M_PI / 180.0));
+      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2,
+          175 * (M_PI / 180.0), 40 * (M_PI / 180.0));
   outputPositions.ringMetacarpalRightRad =
-      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2, 160 * (M_PI / 180.0),
-          25 * (M_PI / 180.0));
+      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2,
+          160 * (M_PI / 180.0), 25 * (M_PI / 180.0));
 
   outputPositions.littleMetacarpalLeftRad =
       map(positions.littleMetacarpalPitchAngleRad, 0, M_PI_2,

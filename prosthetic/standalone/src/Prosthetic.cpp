@@ -1,11 +1,89 @@
 #include "Prosthetic.h"
 #include <fmt/format.h>
 
+double map(double x, const double in_min, const double in_max,
+           const double out_min, const double out_max) {
+  // Clamp the input value to make sure its within the bounds
+  x = std::max(in_min, std::min(x, in_max));
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 // true servo range is about 170°
 Prosthetic::ServoPositions JointPositionsToServoPositions(
-    Prosthetic::JointPositions positions) {
-  // TODO based on physical prosthetic
-  return Prosthetic::ServoPositions{};
+    const Prosthetic::JointPositions& positions) {
+  // 0 -> 180 is counterclockwise
+
+  // index proximal pitch 0 open, 120 closed
+  // index metacarpal all the way down is (0, 180)
+  // index metacarpal all the way left (80, 180)
+  // index metacarpal all the way right (0, 100)
+  // index metacarpal pitch 90 is (150, 20)
+
+  // middle proximal pitch is 180 open, 50 closed
+  // middle metacarpal all the way down is (180, 0)
+  // middle metacarpal all the way left (180, 60)
+  // middle metacarpal all the way right (70, 0)
+  // middle metacarpal pitch 90 is (10, 140)
+
+  // ring proximal pitch is 0 open, 130 closed
+  // ring metacarpal all the way down is (180, 180)
+  // ring metacarpal all the way left (120, 180)
+  // ring metacarpal all the way right (180, 90)
+  // ring metacarpal pitch 90 is (40, 25)
+
+  // little proximal pitch is 180 open, 25 closed
+  // little metacarpal all the way down is (180, 0)
+  // little metacarpal all the way left (180, 70)
+  // little metacarpal all the way right (70, 0)
+  // little metacarpal pitch 90 is (20, 160)
+
+  Prosthetic::ServoPositions outputPositions{};
+
+  outputPositions.thumbProximalPitchRad =
+      map(positions.thumbProximalPitchAngleRad, 0, M_PI_2, 0, 160 * (M_PI / 180.0));
+  outputPositions.indexPitchRad = map(positions.indexProximalPitchAngleRad, 0,
+                                      M_PI_2, M_PI, 50 * (M_PI / 180.0));
+  outputPositions.middlePitchRad = map(positions.middleProximalPitchAngleRad, 0,
+                                       M_PI_2, M_PI, 25 * (M_PI / 180.0));
+  outputPositions.ringPitchRad = map(positions.ringProximalPitchAngleRad, 0,
+                                     M_PI_2, 0, 130 * (M_PI / 180.0));
+  outputPositions.littlePitchRad = map(positions.littleProximalPitchAngleRad, 0,
+                                       M_PI_2, 0, 120 * (M_PI / 180.0));
+
+  // TODO create a dynamical model for the yaw angle of the metacarpal joint
+
+  outputPositions.thumbMetacarpalPitchRad =
+      map(positions.thumbMetacarpalPitchAngleRad, 0, M_PI_2, M_PI, 80 * (M_PI / 180.0));
+
+  outputPositions.indexMetacarpalLeftRad =
+      map(positions.indexMetacarpalPitchAngleRad, 0, M_PI_2,
+          150 * (M_PI / 180.0), 20 * (M_PI / 180.0));
+  outputPositions.indexMetacarpalRightRad =
+      map(positions.indexMetacarpalPitchAngleRad, 0, M_PI_2,
+          20 * (M_PI / 180.0), 160 * (M_PI / 180.0));
+
+  outputPositions.middleMetacarpalLeftRad =
+      map(positions.middleMetacarpalPitchAngleRad, 0, M_PI_2, M_PI,
+          10 * (M_PI / 180.0));
+  outputPositions.middleMetacarpalRightRad =
+      map(positions.middleMetacarpalPitchAngleRad, 0, M_PI_2, 0,
+          140 * (M_PI / 180.0));
+
+  outputPositions.ringMetacarpalLeftRad =
+      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2, 175 * (M_PI / 180.0),
+          40 * (M_PI / 180.0));
+  outputPositions.ringMetacarpalRightRad =
+      map(positions.ringMetacarpalPitchAngleRad, 0, M_PI_2, 160 * (M_PI / 180.0),
+          25 * (M_PI / 180.0));
+
+  outputPositions.littleMetacarpalLeftRad =
+      map(positions.littleMetacarpalPitchAngleRad, 0, M_PI_2,
+          10 * (M_PI / 180.0), 160 * (M_PI / 180.0));
+  outputPositions.littleMetacarpalRightRad =
+      map(positions.littleMetacarpalPitchAngleRad, 0, M_PI_2,
+          140 * (M_PI / 180.0), 0);
+
+  return outputPositions;
 }
 
 Prosthetic::JointPositions ServoPositionsToJointPositions(

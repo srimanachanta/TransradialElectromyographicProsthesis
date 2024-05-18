@@ -88,8 +88,10 @@ Prosthetic::ServoPositions JointPositionsToServoPositions(
 }
 
 Prosthetic::JointPositions ServoPositionsToJointPositions(
-    Prosthetic::ServoPositions positions) {
+    const Prosthetic::ServoPositions& positions) {
+  // TODO implement yaw angle of the metacarpal angle
   // TODO based on physical prosthetic
+  // TODO do this
   return Prosthetic::JointPositions{};
 }
 

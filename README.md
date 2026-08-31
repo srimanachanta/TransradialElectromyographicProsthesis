@@ -2,6 +2,8 @@
 
 [International Science and Engineering Fair Project Board](https://projectboard.world/isef/project/robo024t-low-cost-transradial-electromyographic-prosthetic)
 
+![ISEF Poster](poster.svg)
+
 ### Abstract:
 
 Current commercial and research-grade prosthetics lack fine motor movements and have limited degrees of freedom. These
